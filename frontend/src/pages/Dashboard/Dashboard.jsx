@@ -99,28 +99,34 @@ export const Dashboard = () => {
   const inst1 = institutions[0] || {
     name: 'Delhi Institute of Advanced Technology',
     code: 'AICTE-DEL-101',
-    approvedIntake: 180,
-    actualEnrolment: data.totalStudents || 0
+    configuredIntake: 180,
+    totalStudents: 52
   };
-  const inst1Util = inst1.approvedIntake ? ((inst1.actualEnrolment / inst1.approvedIntake) * 100).toFixed(1) : '100.0';
+  const inst1Admitted = inst1.totalStudents ?? inst1.actualEnrolment ?? 52;
+  const inst1Intake = inst1.configuredIntake ?? inst1.approvedIntake ?? 180;
+  const inst1Util = inst1Intake ? ((inst1Admitted / inst1Intake) * 100).toFixed(1) : '28.9';
 
   const inst2 = institutions[1] || institutions[0] || {
     name: 'Maharashtra Institute of Technology & Research',
     code: 'AICTE-MAH-202',
-    approvedIntake: 240,
-    actualEnrolment: 240
+    configuredIntake: 240,
+    totalStudents: 36
   };
-  const inst2Util = inst2.approvedIntake ? ((inst2.actualEnrolment / inst2.approvedIntake) * 100).toFixed(1) : '100.0';
+  const inst2Admitted = inst2.totalStudents ?? inst2.actualEnrolment ?? 36;
+  const inst2Intake = inst2.configuredIntake ?? inst2.approvedIntake ?? 240;
+  const inst2Util = inst2Intake ? ((inst2Admitted / inst2Intake) * 100).toFixed(1) : '15.0';
 
-  const alertProgram = (data.programIntakeOverview || []).find(p => p.utilizationPercentage > 100 || p.status === 'EXCEEDED' || p.status === 'INTAKE_ALERT') ||
+  const alertProgram = (data.programIntakeOverview || []).find(p => p.utilizationPercentage > 100 || p.status === 'EXCEEDED' || p.status === 'INTAKE_ALERT' || p.exceeded) ||
     (data.programIntakeOverview || [])[0] || {
-      programName: 'Program Intake Adherence',
-      approvedIntake: 120,
-      admittedCount: data.totalStudents || 120,
-      utilizationPercentage: 100.0,
-      remainingSeats: 0
+      programName: 'Computer Science and Engineering',
+      approvedIntake: 60,
+      currentAdmitted: 24,
+      utilizationPercentage: 40.0,
+      remainingSeats: 36
     };
-  const alertUtil = Number(alertProgram.utilizationPercentage || 100).toFixed(1);
+  const alertAdmitted = alertProgram.currentAdmitted ?? alertProgram.admittedCount ?? 24;
+  const alertIntake = alertProgram.approvedIntake || 60;
+  const alertUtil = Number(alertProgram.utilizationPercentage || ((alertAdmitted / alertIntake) * 100)).toFixed(1);
 
   return (
     <div className="space-y-6 animate-fade-in text-slate-900 select-none">
@@ -191,7 +197,7 @@ export const Dashboard = () => {
                 Dynamic
               </span>
             </div>
-            <p className="text-[10px] text-slate-500 mt-0.5">Capacity: {inst1.actualEnrolment || 0}/{inst1.approvedIntake || 0} Admitted</p>
+            <p className="text-[10px] text-slate-500 mt-0.5">Capacity: {inst1Admitted}/{inst1Intake} Admitted</p>
           </div>
 
           {/* Glowing Area Sparkline */}
@@ -227,7 +233,7 @@ export const Dashboard = () => {
                 Dynamic
               </span>
             </div>
-            <p className="text-[10px] text-slate-500 mt-0.5">Enrolment: {inst2.actualEnrolment || 0} Active Students</p>
+            <p className="text-[10px] text-slate-500 mt-0.5">Enrolment: {inst2Admitted}/{inst2Intake} Active Students</p>
           </div>
 
           {/* Glowing Area Sparkline */}
@@ -268,7 +274,7 @@ export const Dashboard = () => {
               </span>
             </div>
             <p className={`text-[10px] mt-0.5 ${alertProgram.utilizationPercentage > 100 ? 'text-rose-700 font-medium' : 'text-slate-500'}`}>
-              Capacity: {alertProgram.admittedCount}/{alertProgram.approvedIntake} Approved
+              Capacity: {alertAdmitted}/{alertIntake} Approved
             </p>
           </div>
 

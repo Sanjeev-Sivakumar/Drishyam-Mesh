@@ -161,7 +161,7 @@ export const Institutions = () => {
                   <div>
                     <span className="text-[10px] text-slate-500 uppercase font-bold block">Actual Enrolment</span>
                     <span className={`text-sm font-bold font-mono ${(inst.actualEnrolment > (inst.approvedIntake || inst.configuredIntake)) ? 'text-rose-700' : 'text-emerald-700'}`}>
-                      {inst.actualEnrolment || (inst.configuredIntake - 2)} admitted
+                      {inst.totalStudents ?? inst.actualEnrolment ?? (inst.configuredIntake - 2)} admitted
                     </span>
                   </div>
                   <div>
