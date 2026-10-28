@@ -136,10 +136,10 @@ export const RegulatoryReportsModal = ({ isOpen, onClose, institutions = [], use
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="relative w-full max-w-3xl bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden my-6">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/40 backdrop-blur-xs flex items-start justify-center pt-4 pb-36 px-4">
+      <div className="relative w-full max-w-3xl bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden max-h-[68vh] flex flex-col mt-4 mb-auto">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-slate-50 border-b border-slate-200">
+        <div className="shrink-0 flex items-center justify-between px-6 py-3.5 bg-slate-50 border-b border-slate-200">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 p-1 flex items-center justify-center shrink-0 shadow-xs">
               <img src="/AICTE.png" alt="AICTE" className="w-full h-full object-contain" />
@@ -160,9 +160,9 @@ export const RegulatoryReportsModal = ({ isOpen, onClose, institutions = [], use
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-6">
+        <div className="overflow-y-auto p-5 space-y-4 flex-1">
           {/* Controls: Academic Year and Scope */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
                 Target Academic Cohort Year
@@ -246,7 +246,7 @@ export const RegulatoryReportsModal = ({ isOpen, onClose, institutions = [], use
         </div>
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-end gap-2 px-6 py-4 bg-slate-50 border-t border-slate-200">
+        <div className="shrink-0 flex items-center justify-end gap-2 px-6 py-3.5 bg-slate-50 border-t border-slate-200">
           <Button variant="secondary" onClick={onClose}>
             Close
           </Button>
