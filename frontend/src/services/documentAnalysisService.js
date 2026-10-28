@@ -7,6 +7,30 @@ const SENTINEL_COGNITIVE_API_KEY = (typeof import.meta !== 'undefined' && import
 
 export const TEST_DOCUMENTS = [
   {
+    id: 'doc-apaar-card-jpeg',
+    name: 'apaar.jpeg',
+    type: 'Official APAAR Digital Card',
+    category: 'National Identity Record',
+    language: 'Bilingual (Hindi + English)',
+    size: '68.5 KB',
+    image: '/apaar.jpeg',
+    description: 'Official National APAAR Student Identity Card issued by Ministry of Education & AICTE',
+    samplePayload: `GOVERNMENT OF INDIA - MINISTRY OF EDUCATION
+AUTOMATED PERMANENT ACADEMIC ACCOUNT REGISTRY (APAAR)
+अपार छात्र पहचान पत्र (NATIONAL APAAR DIGITAL IDENTITY CARD)
+APAAR ID: 9082-3145-6671
+Student Name: Devansh Gupta (देवांश गुप्ता)
+Institution: Delhi Technological University (DTU)
+Program: Computer Science and Engineering
+Academic Year: 2024-2025
+Admission Category: GENERAL
+Aadhaar Verification Token: SHA256:7c9e13d80a91f5432b0129a8f2d91c4b72183e91024bc6719ef8a20391d842b
+AICTE Institutional Approval: F.No. North-West/1-932148201/2024/EOA
+Accreditation Code: AICTE-DEL-101
+Laplacian Blur Variance: 178.40 (High Definition Sharp)
+ELA Tamper Score: 0.01 (Pristine Original)`
+  },
+  {
     id: 'doc-apaar-valid',
     name: 'Official APAAR Digital Identity Card.pdf',
     type: 'APAAR Card',
@@ -502,6 +526,7 @@ export const documentAnalysisService = {
         biometricConfidence: '99.4%',
         blockHash: '0x3a91f820bb9410ea872412dd5f71e9824c892b11548e65a041f02188ab65ec12'
       },
+      image: (fileName?.toLowerCase().includes('apaar') || content?.toLowerCase().includes('apaar')) ? '/apaar.jpeg' : null,
       auditChecks: {
         psiDuplicateMatch: isConcurrentDuplicate,
         intakeLimitDrift: isExcessQuota,

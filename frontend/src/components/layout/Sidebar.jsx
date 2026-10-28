@@ -15,7 +15,8 @@ import {
   Share2,
   Database,
   Lock,
-  FileDiff
+  FileDiff,
+  ScanLine
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { reviewService } from '../../services/reviewService';
@@ -40,6 +41,12 @@ export const Sidebar = () => {
 
   const navItems = [
     { name: 'National Overview', path: '/', icon: LayoutDashboard },
+    {
+      name: 'APAAR Vision Lab',
+      path: '/apaar-forensics',
+      icon: ScanLine,
+      highlightBadge: 'LIVE VISION'
+    },
     {
       name: 'n8n Workflow Engine',
       path: '/workflows',

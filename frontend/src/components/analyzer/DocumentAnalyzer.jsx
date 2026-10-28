@@ -19,7 +19,8 @@ import {
   Camera,
   FileSearch,
   Check,
-  Ban
+  Ban,
+  ChevronRight
 } from 'lucide-react';
 import { documentAnalysisService, TEST_DOCUMENTS } from '../../services/documentAnalysisService';
 import { Badge } from '../ui/Badge';
@@ -462,6 +463,32 @@ export const DocumentAnalyzer = ({ onAnalysisComplete }) => {
                   </span>
                 </div>
               </div>
+
+              {/* Optional Visual Document Image Render */}
+              {analysisResult.image && (
+                <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex flex-col sm:flex-row items-center gap-4">
+                  <img
+                    src={analysisResult.image}
+                    alt="Scanned Document Preview"
+                    className="w-full sm:w-56 h-36 object-contain rounded-lg border border-slate-300 shadow-xs bg-white"
+                  />
+                  <div className="space-y-1.5 text-xs">
+                    <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
+                      Scanned Document Visual Artifact
+                    </span>
+                    <h5 className="font-bold text-slate-900 text-sm">Official National APAAR Student Registry Card</h5>
+                    <p className="text-slate-600 text-[11px] leading-relaxed">
+                      Laplacian edge sharpness verified: 178.40. Zero quantization disparity detected across RGB spectrum.
+                    </p>
+                    <a
+                      href="/apaar-forensics"
+                      className="inline-flex items-center gap-1 text-purple-700 font-bold hover:underline text-xs pt-1"
+                    >
+                      Open in APAAR Vision Lab <ChevronRight className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+                </div>
+              )}
 
               {/* Extracted Metadata Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">

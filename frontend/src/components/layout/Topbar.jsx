@@ -24,6 +24,7 @@ export const Topbar = () => {
   const getPageTitle = () => {
     const path = location.pathname;
     if (path === '/') return 'National Admission Governance & Mesh Intelligence';
+    if (path.startsWith('/apaar-forensics')) return 'APAAR Card Vision Lab & Optical Forensics';
     if (path.startsWith('/workflows')) return 'n8n Autonomous Workflow Orchestration Engine';
     if (path.startsWith('/knowledge-mesh')) return 'Neo4j Multi-Institution Relationship Graph Mesh';
     if (path.startsWith('/students')) return 'Authoritative Student Registry & APAAR Records';

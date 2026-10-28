@@ -17,6 +17,7 @@ import { Compliance } from '../pages/Compliance/Compliance';
 import { Verification } from '../pages/Verification/Verification';
 import { AuditLogs } from '../pages/AuditLogs/AuditLogs';
 import { Settings } from '../pages/Settings/Settings';
+import { ApaarForensics } from '../pages/ApaarForensics/ApaarForensics';
 
 export const AppRoutes = () => {
   return (
@@ -33,6 +34,7 @@ export const AppRoutes = () => {
       <Route element={<ProtectedRoute />}>
         <Route element={<Layout />}>
           <Route path="/" element={<Dashboard />} />
+          <Route path="/apaar-forensics" element={<ApaarForensics />} />
           <Route path="/workflows" element={<Workflows />} />
           <Route path="/knowledge-mesh" element={<KnowledgeMesh />} />
           <Route path="/verification" element={<Verification />} />
