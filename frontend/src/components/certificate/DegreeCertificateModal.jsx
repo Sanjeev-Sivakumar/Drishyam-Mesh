@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
+import { QRCodeSVG } from 'qrcode.react';
 
 export const DegreeCertificateModal = ({ isOpen, onClose, student }) => {
   const printRef = useRef(null);
@@ -247,8 +248,23 @@ export const DegreeCertificateModal = ({ isOpen, onClose, student }) => {
 
               {/* Center Cryptographic QR & Proof */}
               <div className="text-center space-y-1">
-                <div className="w-20 h-20 mx-auto bg-white p-1 rounded-lg border border-purple-300 print:border-black shadow-xs flex items-center justify-center">
-                  <QrCode className="w-16 h-16 text-slate-900" />
+                <div className="w-22 h-22 mx-auto bg-white p-1 rounded-lg border border-purple-300 print:border-black shadow-xs flex items-center justify-center">
+                  <QRCodeSVG
+                    value={JSON.stringify({
+                      type: "W3C-AICTE-VerifiableCredential",
+                      vcId: student.credentialId || ('AICTE-CRED-' + (student.id || '2024')),
+                      apaar: student.syntheticApaarId || '9082-3145-6671',
+                      student: student.studentName || 'Devansh Gupta',
+                      institution: student.institutionName || 'Delhi Technological University (DTU)',
+                      degree: student.degreeAwarded || 'Bachelor of Technology',
+                      division: student.division || 'First Class with Distinction',
+                      sig: student.hashSignature?.substring(0, 32) || '0x7c9e13d80a91f543',
+                      status: "OFFLINE_VERIFIED_AUTHENTIC"
+                    })}
+                    size={80}
+                    level="M"
+                    includeMargin={false}
+                  />
                 </div>
                 <p className="text-[10px] font-mono text-purple-800 print:text-black font-bold">
                   VC-ID: {student.credentialId || 'VC-AICTE-' + student.id}

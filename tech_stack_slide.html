@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Drishyam Mesh - Tech Stack Slide Reference</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #0f172a;
+      color: #0f172a;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .slide-container {
+      width: 1200px;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+    }
+    .slide-header {
+      background: #1e293b;
+      color: #ffffff;
+      padding: 24px 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid #3b82f6;
+    }
+    .slide-title h1 {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+    }
+    .slide-title p {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+    .slide-badge {
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid #3b82f6;
+      color: #60a5fa;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+    th {
+      background: #1e293b;
+      color: #ffffff;
+      padding: 14px 20px;
+      font-size: 14px;
+      font-weight: 700;
+      text-align: left;
+      border-bottom: 2px solid #334155;
+    }
+    th.cat-col { width: 34%; }
+    th.tech-col { width: 66%; }
+    tr:nth-child(even) { background: #f8fafc; }
+    tr:nth-child(odd) { background: #ffffff; }
+    td {
+      padding: 16px 20px;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: middle;
+    }
+    .category-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .category-name {
+      font-size: 13px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.2px;
+    }
+    .icons-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .icon-box {
+      width: 44px;
+      height: 44px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      transition: transform 0.2s;
+    }
+    .icon-box img, .icon-box svg {
+      width: 100%;
+      height: 100%;
+      object-contain: contain;
+    }
+    .tech-list {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #1e293b;
+      line-height: 1.5;
+    }
+    .tech-highlight {
+      color: #2563eb;
+      font-weight: 700;
+    }
+    .tech-sub {
+      color: #64748b;
+      font-weight: 500;
+      font-size: 12px;
+    }
+    .instructions {
+      width: 1200px;
+      margin-top: 24px;
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 20px 28px;
+      border-radius: 14px;
+      border: 1px solid #334155;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .instructions strong { color: #60a5fa; }
+  </style>
+</head>
+<body>
+
+  <div class="slide-container">
+    <div class="slide-header">
+      <div class="slide-title">
+        <h1>Drishyam Mesh • System Architecture & Enterprise Technology Stack</h1>
+        <p>AICTE National Student Data Governance, Anti-Fraud Forensics & Verifiable Credential Platform</p>
+      </div>
+      <div class="slide-badge">Team Algorythm • SIH 2026</div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th class="cat-col">Categories & Verified Icons</th>
+          <th class="tech-col">Technologies / Tools Implemented in Demo Prototype</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Row 1: Frontend -->
+        <tr>
+          <td>
+            <div class="category-cell">
+              <span class="category-name">Frontend & Institutional Portals</span>
+              <div class="icons-row">
+                <div class="icon-box" title="React.js">
+                  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" alt="React">
+                </div>
+                <div class="icon-box" title="Vite">
+                  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg" alt="Vite">
+                </div>
+                <div class="icon-box" title="Tailwind CSS">
+                  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" alt="Tailwind">
+                </div>
+                <div class="icon-box" title="Lucide Icons">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="tech-list">
+              <span class="tech-highlight">React 19, Vite 8.3, Tailwind CSS</span>, Shadcn/ui tokens, Lucide Icons, Recharts, Interactive SVG/Canvas Graph Explorer
+              <div class="tech-sub">High-contrast white theme design system with sub-second HMR compilation.</div>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Row 2: Cryptography -->
+        <tr>
+          <td>
+            <div class="category-cell">
+              <span class="category-name">Privacy-Preserving Cryptography</span>
+              <div class="icons-row">
+                <div class="icon-box" title="W3C Verifiable Credentials">
+                  <img src="https://www.w3.org/Icons/WWW/w3c_home_nb-v.svg" alt="W3C">
+                </div>
+                <div class="icon-box" title="Ed25519 Cryptographic Shield">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <path d="m9 12 2 2 4-4"/>
+                  </svg>
+                </div>
+                <div class="icon-box" title="Offline QR Verification">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="5" height="5" x="3" y="3" rx="1"/>
+                    <rect width="5" height="5" x="16" y="3" rx="1"/>
+                    <rect width="5" height="5" x="3" y="16" rx="1"/>
+                    <path d="M21 16h-3a2 2 0 0 0-2 2v3M21 21v.01M12 7v3a2 2 0 0 1-2 2H7M3 12h.01M12 3h.01M12 16v.01M16 12h1M21 12v.01M12 21v-1"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="tech-list">
+              <span class="tech-highlight">W3C Verifiable Credentials, DPDP Act 2023 Consent Gateway</span>, Ed25519 & RSA-2048 Digital Signatures, Private Set Intersection (PSI), Offline QR Verification
+              <div class="tech-sub">Zero-knowledge selective attribute disclosure with instant cryptographic authenticity.</div>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Row 3: Graph Forensics -->
+        <tr>
+          <td>
+            <div class="category-cell">
+              <span class="category-name">Identity Resolution & Graph Forensics</span>
+              <div class="icons-row">
+                <div class="icon-box" title="Neo4j Graph Database">
+                  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/neo4j/neo4j-original.svg" alt="Neo4j">
+                </div>
+                <div class="icon-box" title="Cypher Query Language">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="18" cy="5" r="3"/>
+                    <circle cx="6" cy="12" r="3"/>
+                    <circle cx="18" cy="19" r="3"/>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="tech-list">
+              <span class="tech-highlight">Neo4j Graph Database (Bolt 7687), Cypher 5.12 Engine</span>, Multi-Institution Topological Traversal, RapidFuzz Token Distance Matching
+              <div class="tech-sub">Traverses concurrent admission collisions where one candidate claims seats across multiple states.</div>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Row 4: AI Anomaly -->
+        <tr>
+          <td>
+            <div class="category-cell">
+              <span class="category-name">AI Anomaly Detection & Forensic Vision</span>
+              <div class="icons-row">
+                <div class="icon-box" title="Sentinel Cognitive Vision / OCR">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </div>
+                <div class="icon-box" title="Discrete Cosine Transform (DCT)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="18" height="18" x="3" y="3" rx="2"/>
+                    <path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>
+                  </svg>
+                </div>
+                <div class="icon-box" title="Scikit-Learn">
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Scikit_learn_logo_small.svg" alt="Scikit-Learn">
+                </div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="tech-list">
+              <span class="tech-highlight">Sentinel Cognitive Vision Engine, Error Level Analysis (ELA)</span>, Discrete Cosine Transform (DCT) Quantization, Multilingual OCR (Hindi, Tamil, Marathi, Telugu), Scikit-Learn Isolation Forest
+              <div class="tech-sub">Flags photoshopped splices and font baseline jitter while quarantining non-academic receipts.</div>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Row 5: Workflow -->
+        <tr>
+          <td>
+            <div class="category-cell">
+              <span class="category-name">Workflow Orchestration & Automation</span>
+              <div class="icons-row">
+                <div class="icon-box" title="n8n Workflow Automation">
+                  <svg viewBox="0 0 24 24" fill="#ff6d5a">
+                    <path d="M4 8a4 4 0 1 1 8 0 4 4 0 0 1-8 0zm10 8a4 4 0 1 1 8 0 4 4 0 0 1-8 0zM4 16a4 4 0 1 0 8 0 4 4 0 0 0-8 0z"/>
+                    <path d="M8 8v8m8 0V8" stroke="#ff6d5a" stroke-width="3"/>
+                  </svg>
+                </div>
+                <div class="icon-box" title="Event-Driven Webhooks">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 16.98h-5.99c-1.1 0-1.95.94-2.48 1.9A4 4 0 0 1 2 17c.01-.7.2-1.4.57-2"/>
+                    <path d="m6 17 3.13-5.78c.53-.97.1-2.18-.5-3.1a4 4 0 1 1 6.89-4.06l3.19 5.74c.54.98 1.63 1.54 2.76 1.43A4 4 0 1 1 18 17"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="tech-list">
+              <span class="tech-highlight">Self-Hosted n8n Platform, Event-Driven REST Webhooks</span>, 4 Autonomous Pipelines (Ingestion, Cross-State PSI, Quota Enforcement, Credential Relay)
+              <div class="tech-sub">Real-time visual node monitoring with millisecond execution latency telemetry.</div>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Row 6: Database & Ledger -->
+        <tr>
+          <td>
+            <div class="category-cell">
+              <span class="category-name">Database Core & Tamper-Evident Ledger</span>
+              <div class="icons-row">
+                <div class="icon-box" title="MySQL 8.0">
+                  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" alt="MySQL">
+                </div>
+                <div class="icon-box" title="SHA-256 Tamper Ledger">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </div>
+                <div class="icon-box" title="Flyway Migrations">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m16 16 6-6-6-6M8 8l-6 6 6 6"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="tech-list">
+              <span class="tech-highlight">MySQL 8.0 (InnoDB), Flyway Migrations (V1, V2)</span>, Spring Data JPA / Hibernate, Cryptographic Append-Only SHA-256 Hash Chained Tamper Ledger
+              <div class="tech-sub">Complete referential integrity, student historical revision logs, and immutable audit trails.</div>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Row 7: Core Backend Gateway -->
+        <tr>
+          <td>
+            <div class="category-cell">
+              <span class="category-name">Core Backend Gateway & Security</span>
+              <div class="icons-row">
+                <div class="icon-box" title="Java 21 LTS">
+                  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" alt="Java">
+                </div>
+                <div class="icon-box" title="Spring Boot 3.3">
+                  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg" alt="Spring Boot">
+                </div>
+                <div class="icon-box" title="OpenAPI / Swagger">
+                  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/swagger/swagger-original.svg" alt="Swagger">
+                </div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="tech-list">
+              <span class="tech-highlight">Spring Boot 3.3.5, Java 21 LTS, Spring Security</span> (Stateless JWT + RBAC), Tenant-Isolated IDOR Protection, OpenAPI 3.0 / Swagger UI, Multipart File Handlers
+              <div class="tech-sub">Enterprise-grade statutory architecture matching AICTE, NIC, and DigiLocker standards.</div>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Row 8: DevOps & Infrastructure -->
+        <tr>
+          <td>
+            <div class="category-cell">
+              <span class="category-name">DevOps & Container Infrastructure</span>
+              <div class="icons-row">
+                <div class="icon-box" title="Docker">
+                  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" alt="Docker">
+                </div>
+                <div class="icon-box" title="GitHub">
+                  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub">
+                </div>
+                <div class="icon-box" title="Apache Maven">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#c026d3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                    <line x1="12" y1="22.08" x2="12" y2="12"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="tech-list">
+              <span class="tech-highlight">Docker & Docker Compose Multi-Container Stack</span>, Apache Maven 3.9+, Git & GitHub, Linux (Ubuntu), 44-Step Automated E2E Pipeline Test Suite
+              <div class="tech-sub">Zero secret exposure with GitHub Push Protection compliance. Fully deployable on AICTE cloud servers.</div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="instructions">
+    <p><strong>How to Use This in Your Presentation:</strong></p>
+    <p>1. Open this file in your browser: <code>c:\Users\Sanjeev Kumar S\Downloads\EduTrust-main\EduTrust-main\tech_stack_slide.html</code>.</p>
+    <p>2. You can directly take a full screenshot (Win + Shift + S) of the card above and paste it directly onto your PowerPoint slide, OR right-click on any icon box to copy/save that specific logo.</p>
+  </div>
+
+</body>
+</html>
