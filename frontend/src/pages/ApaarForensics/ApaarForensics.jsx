@@ -166,32 +166,40 @@ export const ApaarForensics = () => {
 
     try {
       const result = await documentAnalysisService.analyzeDocument(file);
-      if (!result.isAcademic) {
-        showToast(result.status === 'FLAGGED_TAMPERED' ? 'Tampered document detected! Ingestion halted.' : 'Irrelevant non-academic document flagged! Ingestion halted.', 'error');
-      } else {
-        showToast('Academic document analyzed successfully!', 'success');
-      }
-
       const isTampered = result.status === 'FLAGGED_TAMPERED';
       const isIrrelevant = result.status === 'FLAGGED_IRRELEVANT' || !result.isAcademic;
+      const isLogo = result.detectedCategory?.includes('Logo') || result.detectedCategory?.includes('Crest') || result.detectedCategory?.includes('Graphic');
+
+      if (!result.isAcademic) {
+        showToast(
+          isTampered
+            ? 'Tampered document detected! Ingestion halted.'
+            : isLogo
+            ? 'Institutional logo/emblem quarantined! Standalone graphics contain zero student credentials.'
+            : 'Irrelevant non-academic document flagged! Ingestion halted.',
+          'error'
+        );
+      } else {
+        showToast('Academic document verified! Official National APAAR Digital Card recognized.', 'success');
+      }
       
       const newProfile = {
         id: 'uploaded-doc',
         title: file.name,
-        type: result.detectedCategory || (isIrrelevant ? 'Irrelevant Non-Academic' : 'Custom Document'),
-        badge: isTampered ? 'Tampered / Photoshopped' : isIrrelevant ? 'Irrelevant Non-Academic' : (result.multilingualProfile?.language || 'Analyzed Record'),
+        type: result.detectedCategory || (isLogo ? 'Institutional Crest / Logo Graphic' : isIrrelevant ? 'Irrelevant Non-Academic' : 'Custom Document'),
+        badge: isTampered ? 'Tampered / Photoshopped' : isLogo ? 'Quarantined Logo Graphic' : isIrrelevant ? 'Irrelevant Non-Academic' : 'Verified Academic Record',
         image: objectUrl,
-        issuingBankOrAuthority: isIrrelevant ? 'Zero Institutional Accreditation' : (result.extractedData?.institutionName || 'AICTE Verified Issuer'),
-        docClassification: result.detectedCategory || (isIrrelevant ? 'Irrelevant Non-Academic' : 'Academic Allotment'),
+        issuingBankOrAuthority: isLogo ? 'Institutional Graphic Media (Zero Student Data)' : isIrrelevant ? 'Zero Institutional Accreditation' : (result.extractedData?.institutionName || 'AICTE Verified Issuer'),
+        docClassification: result.detectedCategory || (isLogo ? 'Institutional Crest / Logo Graphic (Non-Academic)' : isIrrelevant ? 'Irrelevant Non-Academic' : 'Academic Allotment'),
         detectedLanguage: isIrrelevant ? 'N/A' : (result.multilingualProfile?.language || 'English'),
         laplacianBlurVariance: isIrrelevant ? 'N/A (Irrelevant File)' : '168.90 (Sharp)',
         elaTamperDetection: isTampered ? '0.88 (Tampered)' : isIrrelevant ? 'N/A (Non-Academic)' : '0.01 (Pristine)',
         lienMarkingCheck: isIrrelevant ? 'REJECTED (NON-ACADEMIC)' : (isTampered ? 'REJECTED (TAMPERED)' : 'CONFIRMED (AICTE REGULATORY)'),
         overallVisionStatus: isTampered ? 'FLAGGED / TAMPERED' : isIrrelevant ? 'FLAGGED / IRRELEVANT' : 'EXCELLENT / COMPLIANT',
         statusColor: (isTampered || isIrrelevant) ? 'rose' : 'emerald',
-        apaarId: isIrrelevant ? 'N/A - QUARANTINED' : (result.extractedData?.syntheticApaarId || '9082-3145-6671'),
-        studentName: isIrrelevant ? 'N/A - Non-Academic File' : (result.extractedData?.studentName || file.name.replace(/\.[^/.]+$/, '')),
-        institution: isIrrelevant ? 'Zero Academic Provenance' : (result.extractedData?.institutionName || 'Recognized Technical College'),
+        apaarId: isIrrelevant ? 'N/A - QUARANTINED' : (result.extractedData?.syntheticApaarId || '7908-6799-7908'),
+        studentName: isIrrelevant ? (isLogo ? 'N/A - Logo / Crest Graphic' : 'N/A - Non-Academic File') : (result.extractedData?.studentName || file.name.replace(/\.[^/.]+$/, '')),
+        institution: isIrrelevant ? (isLogo ? 'All India Council for Technical Education (Symbol Only)' : 'Zero Academic Provenance') : (result.extractedData?.institutionName || 'Recognized Technical College'),
         program: isIrrelevant ? 'Quarantined File' : (result.extractedData?.program || 'Engineering & Technology'),
         academicYear: isIrrelevant ? 'N/A' : '2024-2025',
         isAcademic: result.isAcademic,

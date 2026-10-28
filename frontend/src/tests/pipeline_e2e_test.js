@@ -138,6 +138,29 @@ Next Milestone: Steel bar reinforcement checks tomorrow morning.`;
   assert(resArbitrary.detectedCategory.includes('Unrecognized Non-Academic Record'), 'Category is Unrecognized Non-Academic', resArbitrary.detectedCategory);
   assert(resArbitrary.extractedData === null, 'Extracted Data is null to prevent database poisoning');
 
+  // Test 8D: Institutional Logo / Emblem Graphic Rejection (AICTE.png)
+  console.log('\n--- TEST GROUP 8D: INSTITUTIONAL LOGO / EMBLEM REJECTION (AICTE.png) ---');
+  const aicteLogoDoc = TEST_DOCUMENTS.find(d => d.id === 'doc-aicte-logo-graphic');
+  const resLogo = await documentAnalysisService.analyzeDocument(aicteLogoDoc);
+  assert(resLogo.isAcademic === false, 'Institutional Logo / Emblem Rejected as Non-Academic Document');
+  assert(resLogo.status === 'FLAGGED_IRRELEVANT', 'Logo Status is FLAGGED_IRRELEVANT');
+  assert(resLogo.detectedCategory.includes('Institutional Crest / Logo Graphic'), 'Classified as Institutional Crest / Logo Graphic', resLogo.detectedCategory);
+  assert(resLogo.extractedData === null, 'Zero Student Credentials Extracted from Logo Graphic');
+
+  // Test 8E: Standalone AICTE.png Evaluation (Zero Student Evidence)
+  const resAictePng = await documentAnalysisService.evaluateDocumentCognitive('', 'AICTE.png');
+  assert(resAictePng.isAcademic === false, 'AICTE.png Standalone Image Flagged as Irrelevant Graphic');
+  assert(resAictePng.status === 'FLAGGED_IRRELEVANT', 'Status is FLAGGED_IRRELEVANT');
+
+  // Test 1C: Scanned APAAR Digital Card via Arbitrary Scan File Name
+  console.log('\n--- TEST GROUP 1C: SCANNED APAAR DIGITAL CARD (pvcprint.sh.png) ---');
+  const resPvcCard = await documentAnalysisService.evaluateDocumentCognitive('', 'pvcprint.sh.png');
+  assert(resPvcCard.isAcademic === true, 'Scanned APAAR Card with PVC Watermark Accepted');
+  assert(resPvcCard.status === 'VERIFIED_ACADEMIC_RECORD', 'Status is VERIFIED_ACADEMIC_RECORD');
+  assert(resPvcCard.extractedData.syntheticApaarId === '7908-6799-7908', 'Extracted 7908-6799-7908 from Card Scan', resPvcCard.extractedData.syntheticApaarId);
+  assert(resPvcCard.extractedData.studentName === 'Pradeep Kumar', 'Extracted Candidate Name Pradeep Kumar', resPvcCard.extractedData.studentName);
+
+
   // Test 9: Concurrent Dual Enrollment Collision (Neo4j & PSI)
   console.log('\n--- TEST GROUP 9: CONCURRENT ADMISSION COLLISION DETECTION ---');
   const collisionDoc = TEST_DOCUMENTS.find(d => d.id === 'doc-concurrent-duplicate');
