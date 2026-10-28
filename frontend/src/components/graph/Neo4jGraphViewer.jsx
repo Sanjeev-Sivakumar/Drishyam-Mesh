@@ -28,6 +28,7 @@ export const Neo4jGraphViewer = ({ activeUploadedRecord = null }) => {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
+  const [hoveredEdgeIndex, setHoveredEdgeIndex] = useState(null);
   const [filterMode, setFilterMode] = useState('ALL'); // ALL, COLLISIONS, INSTITUTIONS, APAAR
   const [searchQuery, setSearchQuery] = useState('');
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -64,24 +65,26 @@ export const Neo4jGraphViewer = ({ activeUploadedRecord = null }) => {
       const dynamicNodes = [];
       const dynamicEdges = [];
 
-      // 1. Institution nodes
+      // 1. Institution nodes (Tier 4: Bottom, y = 475)
       const instPositions = [
-        { x: 180, y: 340 },
-        { x: 480, y: 360 },
-        { x: 740, y: 340 }
+        { x: 200, y: 475 },
+        { x: 550, y: 475 },
+        { x: 880, y: 475 }
       ];
 
       insts.forEach((inst, idx) => {
-        const pos = instPositions[idx] || { x: 200 + idx * 160, y: 340 };
+        const pos = instPositions[idx] || { x: 200 + idx * 300, y: 475 };
+        const short = inst.code ? inst.code.replace('AICTE-', '').replace('-101', '').replace('-202', '').replace('-301', '') : `UNI-${idx + 1}`;
         dynamicNodes.push({
           id: `inst_${inst.id}`,
           rawId: inst.id,
           label: inst.name,
+          short: short || `U${idx + 1}`,
           code: inst.code,
           type: 'INSTITUTION',
           x: pos.x,
           y: pos.y,
-          color: idx === 1 ? '#EF4444' : '#10B981',
+          color: '#059669',
           radius: 28,
           status: 'ACCREDITED',
           approvedIntake: inst.approvedIntake || 180,
@@ -90,45 +93,45 @@ export const Neo4jGraphViewer = ({ activeUploadedRecord = null }) => {
         });
       });
 
-      // 2. Program Nodes
+      // 2. Program Nodes (Tier 1: Top, y = 75)
       const programs = [
-        { id: 'prog_cse', label: 'B.Tech CSE', x: 120, y: 120, color: '#6366F1', radius: 18, code: 'CSE-101' },
-        { id: 'prog_entc', label: 'B.Tech EnTC', x: 540, y: 220, color: '#F59E0B', radius: 18, code: 'ETC-202' },
-        { id: 'prog_it', label: 'B.Tech IT', x: 780, y: 180, color: '#6366F1', radius: 18, code: 'IT-303' }
+        { id: 'prog_cse', label: 'B.Tech CSE', short: 'CSE', x: 200, y: 75, color: '#4F46E5', radius: 24, code: 'CSE-101', type: 'PROGRAM' },
+        { id: 'prog_entc', label: 'B.Tech EnTC', short: 'EnTC', x: 550, y: 75, color: '#D97706', radius: 24, code: 'ETC-202', type: 'PROGRAM' },
+        { id: 'prog_it', label: 'B.Tech IT', short: 'IT', x: 880, y: 75, color: '#4F46E5', radius: 24, code: 'IT-303', type: 'PROGRAM' }
       ];
       programs.forEach(p => dynamicNodes.push(p));
 
-      // Edges: Institution -> Program
-      dynamicEdges.push({ from: 'inst_1', to: 'prog_cse', label: 'OFFERS', color: '#6366F1', strokeWidth: 1.5 });
-      dynamicEdges.push({ from: 'inst_2', to: 'prog_entc', label: 'OFFERS', color: '#F59E0B', strokeWidth: 1.5 });
+      // Edges: Institution -> Program (OFFERS)
+      dynamicEdges.push({ from: 'inst_1', to: 'prog_cse', label: 'OFFERS', color: '#94A3B8', strokeWidth: 1.5, strokeDasharray: '4,4' });
+      if (insts.length > 1) {
+        dynamicEdges.push({ from: 'inst_2', to: 'prog_entc', label: 'OFFERS', color: '#94A3B8', strokeWidth: 1.5, strokeDasharray: '4,4' });
+      }
       if (insts.length > 2) {
-        dynamicEdges.push({ from: 'inst_3', to: 'prog_it', label: 'OFFERS', color: '#6366F1', strokeWidth: 1.5 });
+        dynamicEdges.push({ from: 'inst_3', to: 'prog_it', label: 'OFFERS', color: '#94A3B8', strokeWidth: 1.5, strokeDasharray: '4,4' });
       }
 
-      // 3. Student & APAAR nodes
-      const studentCoords = [
-        { x: 260, y: 180 },
-        { x: 420, y: 140 },
-        { x: 640, y: 180 },
-        { x: 740, y: 120 }
-      ];
+      // 3. Student & APAAR nodes (Tier 2: y = 205, Tier 3: y = 340)
+      const studentXCoords = [110, 275, 440, 610, 775, 940];
+      const studentsToRender = students.slice(0, 6);
 
-      students.slice(0, 4).forEach((s, idx) => {
-        const sCoord = studentCoords[idx] || { x: 200 + idx * 140, y: 140 };
+      studentsToRender.forEach((s, idx) => {
+        const sX = studentXCoords[idx] || (110 + idx * 165);
         const sId = `s_${s.id}`;
         const aId = `apaar_${s.id}`;
-        const isCollision = s.admissionStatus === 'FLAGGED' || (s.studentName && s.studentName.toLowerCase().includes('singhania')) || idx === 0;
+        const isCollision = idx === 0 || s.admissionStatus === 'FLAGGED' || (s.studentName && s.studentName.toLowerCase().includes('singhania'));
+        const initials = s.studentName ? s.studentName.split(' ').map(p => p[0]).join('').substring(0, 2).toUpperCase() : `S${idx + 1}`;
 
-        // Student Node
+        // Student Node (Tier 2: y = 205)
         dynamicNodes.push({
           id: sId,
           rawId: s.id,
           label: s.studentName,
+          short: initials,
           type: 'STUDENT',
-          x: sCoord.x,
-          y: sCoord.y,
-          color: isCollision ? '#EF4444' : '#8B5CF6',
-          radius: 24,
+          x: sX,
+          y: 205,
+          color: isCollision ? '#EF4444' : '#7C3AED',
+          radius: 22,
           status: isCollision ? 'FLAGGED_COLLISION' : 'NORMAL',
           apaar: s.syntheticApaarId,
           enrollmentNumber: s.enrollmentNumber || `EN-2024-00${idx + 1}`,
@@ -137,49 +140,50 @@ export const Neo4jGraphViewer = ({ activeUploadedRecord = null }) => {
           riskScore: isCollision ? 0.94 : 0.04
         });
 
-        // APAAR Node
+        // APAAR Node (Tier 3: y = 340, aligned directly beneath student)
         dynamicNodes.push({
           id: aId,
-          label: `APAAR: ${s.syntheticApaarId}`,
+          label: `APAAR: ${s.syntheticApaarId.substring(0, 9)}...`,
+          fullApaar: s.syntheticApaarId,
+          short: 'ID',
           type: 'APAAR_ID',
-          x: sCoord.x + 90,
-          y: sCoord.y + 70,
-          color: '#00E5FF',
-          radius: 19,
+          x: sX,
+          y: 340,
+          color: '#0284C7',
+          radius: 18,
           status: 'VERIFIED',
           apaar: s.syntheticApaarId,
           algorithm: 'Ed25519-SHA256'
         });
 
-        // Edge: Student -> APAAR
+        // Edge: Student -> APAAR (Straight vertical downward line)
         dynamicEdges.push({
           from: sId,
           to: aId,
           label: 'HAS_IDENTIFIER',
-          color: '#00E5FF',
+          color: '#0284C7',
           strokeWidth: 2
         });
 
-        // Edge: Student -> Program
+        // Edge: Student -> Program (PURSUING)
+        const targetProg = idx < 2 ? 'prog_cse' : idx < 4 ? 'prog_entc' : 'prog_it';
         dynamicEdges.push({
           from: sId,
-          to: idx === 1 ? 'prog_entc' : 'prog_cse',
+          to: targetProg,
           label: 'PURSUING',
-          color: '#8B5CF6',
-          strokeWidth: 2
+          color: '#818CF8',
+          strokeWidth: 1.8
         });
 
-        // Edge: Student -> Primary Institution
-        const targetInst = insts.find(i => i.id === s.institutionId) || insts[0];
-        if (targetInst) {
-          dynamicEdges.push({
-            from: sId,
-            to: `inst_${targetInst.id}`,
-            label: 'ENROLLED_AT (Confirmed)',
-            color: '#10B981',
-            strokeWidth: 3
-          });
-        }
+        // Edge: APAAR -> Primary Institution (ENROLLED_AT)
+        const targetInst = idx < 2 ? 'inst_1' : idx < 4 ? (insts[1] ? `inst_${insts[1].id}` : 'inst_1') : (insts[2] ? `inst_${insts[2].id}` : 'inst_1');
+        dynamicEdges.push({
+          from: aId,
+          to: targetInst,
+          label: 'ENROLLED_AT (Confirmed)',
+          color: '#10B981',
+          strokeWidth: 2.5
+        });
 
         // Active Collision Edge if detected
         if (isCollision && insts.length > 1) {
@@ -190,7 +194,8 @@ export const Neo4jGraphViewer = ({ activeUploadedRecord = null }) => {
             color: '#EF4444',
             strokeWidth: 3.5,
             dashed: true,
-            pulse: true
+            pulse: true,
+            isCurved: true
           });
         }
       });
@@ -524,7 +529,7 @@ RETURN a, colleges AS duplicateClaimViolation;`;
           <svg
             ref={svgRef}
             className="w-full h-full cursor-grab active:cursor-grabbing"
-            viewBox="0 0 900 480"
+            viewBox="0 0 1060 560"
             style={{
               transform: `scale(${zoomLevel})`,
               transformOrigin: 'center center',
@@ -532,7 +537,7 @@ RETURN a, colleges AS duplicateClaimViolation;`;
             }}
           >
             {/* Pure white SVG background */}
-            <rect width="900" height="480" fill="#FFFFFF" />
+            <rect width="1060" height="560" fill="#FFFFFF" />
 
             <defs>
               <filter id="glow-node" x="-20%" y="-20%" width="140%" height="140%">
@@ -546,51 +551,81 @@ RETURN a, colleges AS duplicateClaimViolation;`;
               </linearGradient>
             </defs>
 
+            {/* Visual Tier Guideline Hints (Subtle and clean) */}
+            <g opacity="0.4" stroke="#E2E8F0" strokeDasharray="3 3">
+              <line x1="50" y1="75" x2="1010" y2="75" />
+              <line x1="50" y1="205" x2="1010" y2="205" />
+              <line x1="50" y1="340" x2="1010" y2="340" />
+              <line x1="50" y1="475" x2="1010" y2="475" />
+            </g>
+
             {/* Edges */}
             {filteredEdges.map((edge, idx) => {
               const fromNode = nodes.find(n => n.id === edge.from);
               const toNode = nodes.find(n => n.id === edge.to);
               if (!fromNode || !toNode) return null;
 
-              const isCollisionEdge = edge.pulse || edge.dashed;
+              const isCollisionEdge = edge.pulse || edge.dashed || edge.isCurved;
+              const isHovered = hoveredEdgeIndex === idx || selectedNode?.id === edge.from || selectedNode?.id === edge.to;
               const midX = (fromNode.x + toNode.x) / 2;
               const midY = (fromNode.y + toNode.y) / 2;
 
               return (
-                <g key={`edge-${idx}`}>
-                  <line
-                    x1={fromNode.x}
-                    y1={fromNode.y}
-                    x2={toNode.x}
-                    y2={toNode.y}
-                    stroke={isCollisionEdge ? 'url(#edge-collision-grad)' : (edge.color === '#6366F1' ? '#4F46E5' : edge.color === '#00E5FF' ? '#0284C7' : edge.color)}
-                    strokeWidth={isCollisionEdge ? 3.5 : 2}
-                    strokeDasharray={isCollisionEdge ? '6,4' : undefined}
-                    opacity={0.9}
-                  />
+                <g
+                  key={`edge-${idx}`}
+                  onMouseEnter={() => setHoveredEdgeIndex(idx)}
+                  onMouseLeave={() => setHoveredEdgeIndex(null)}
+                  className="cursor-pointer"
+                >
+                  {edge.isCurved ? (
+                    <path
+                      d={`M ${fromNode.x} ${fromNode.y} C ${fromNode.x} ${(fromNode.y + toNode.y)/2 + 75}, ${(fromNode.x + toNode.x)/2} ${toNode.y}, ${toNode.x} ${toNode.y}`}
+                      fill="none"
+                      stroke="url(#edge-collision-grad)"
+                      strokeWidth={isHovered ? 4.5 : 3.5}
+                      strokeDasharray="6,4"
+                      opacity={0.95}
+                    />
+                  ) : (
+                    <line
+                      x1={fromNode.x}
+                      y1={fromNode.y}
+                      x2={toNode.x}
+                      y2={toNode.y}
+                      stroke={edge.color === '#6366F1' ? '#4F46E5' : edge.color}
+                      strokeWidth={isHovered ? 3.5 : (edge.strokeWidth || 2)}
+                      strokeDasharray={edge.strokeDasharray || undefined}
+                      opacity={isHovered ? 1 : 0.75}
+                    />
+                  )}
 
-                  {/* Edge Label Badge */}
-                  <rect
-                    x={midX - 45}
-                    y={midY - 9}
-                    width={90}
-                    height={18}
-                    rx={5}
-                    fill="#FFFFFF"
-                    stroke={isCollisionEdge ? '#DC2626' : '#94A3B8'}
-                    strokeWidth={1.5}
-                  />
-                  <text
-                    x={midX}
-                    y={midY + 3.5}
-                    textAnchor="middle"
-                    fill={isCollisionEdge ? '#B91C1C' : '#0F172A'}
-                    fontSize="8.5"
-                    fontWeight="800"
-                    fontFamily="monospace"
-                  >
-                    {edge.label.split(' ')[0]}
-                  </text>
+                  {/* Collision edge badge (always visible) OR standard edge badge (on hover/selected) */}
+                  {(isCollisionEdge || isHovered) && (
+                    <g className="pointer-events-none transition-all duration-200">
+                      <rect
+                        x={edge.isCurved ? midX - 65 : midX - 45}
+                        y={edge.isCurved ? midY + 30 : midY - 9}
+                        width={edge.isCurved ? 148 : 90}
+                        height={18}
+                        rx={5}
+                        fill={isCollisionEdge ? '#FEF2F2' : '#FFFFFF'}
+                        stroke={isCollisionEdge ? '#DC2626' : '#94A3B8'}
+                        strokeWidth={1.5}
+                        filter="drop-shadow(0 1px 2px rgba(0,0,0,0.08))"
+                      />
+                      <text
+                        x={edge.isCurved ? midX + 9 : midX}
+                        y={edge.isCurved ? midY + 42.5 : midY + 3.5}
+                        textAnchor="middle"
+                        fill={isCollisionEdge ? '#B91C1C' : '#0F172A'}
+                        fontSize="8.5"
+                        fontWeight="800"
+                        fontFamily="monospace"
+                      >
+                        {edge.label.split(' ')[0]} {isCollisionEdge ? '(Violation)' : ''}
+                      </text>
+                    </g>
+                  )}
                 </g>
               );
             })}
@@ -600,10 +635,8 @@ RETURN a, colleges AS duplicateClaimViolation;`;
               const isSelected = selectedNode?.id === node.id;
               const isCollisionNode = node.status === 'FLAGGED_COLLISION';
               const nodeFillColor = node.color === '#00E5FF' ? '#0284C7' : node.color;
-              const typeBadgeColor = node.type === 'INSTITUTION' ? '#047857' :
-                                     node.type === 'STUDENT' ? (isCollisionNode ? '#B91C1C' : '#6D28D9') :
-                                     node.type === 'APAAR_ID' ? '#0369A1' :
-                                     '#4338CA';
+              const displayText = node.label.length > 20 ? node.label.substring(0, 18) + '...' : node.label;
+              const pillWidth = Math.min(135, Math.max(54, displayText.length * 6.2 + 14));
 
               return (
                 <g
@@ -619,7 +652,7 @@ RETURN a, colleges AS duplicateClaimViolation;`;
                       fill="none"
                       stroke={isCollisionNode ? '#DC2626' : '#7C3AED'}
                       strokeWidth={2.5}
-                      opacity={0.7}
+                      opacity={0.8}
                       className={isCollisionNode ? 'animate-ping' : ''}
                     />
                   )}
@@ -633,51 +666,40 @@ RETURN a, colleges AS duplicateClaimViolation;`;
                     filter="url(#glow-node)"
                   />
 
-                  {/* White pill background for node label for 100% clarity over edges */}
-                  <rect
-                    x={-60}
-                    y={node.radius + 4}
-                    width={120}
-                    height={18}
-                    rx={9}
+                  {/* Label/Abbreviation inside circle */}
+                  <text
+                    y={node.radius > 22 ? 4.5 : 3.5}
+                    textAnchor="middle"
                     fill="#FFFFFF"
-                    stroke="#CBD5E1"
-                    strokeWidth={1.5}
+                    fontSize={node.radius > 22 ? "11" : "9.5"}
+                    fontWeight="800"
+                    fontFamily="sans-serif"
+                    className="select-none pointer-events-none"
+                  >
+                    {node.short || (node.label ? node.label.substring(0, 2).toUpperCase() : '')}
+                  </text>
+
+                  {/* Compact auto-sized badge below circle */}
+                  <rect
+                    x={-pillWidth / 2}
+                    y={node.radius + 6}
+                    width={pillWidth}
+                    height={17}
+                    rx={5}
+                    fill="#FFFFFF"
+                    stroke={isCollisionNode ? '#EF4444' : isSelected ? '#7C3AED' : '#CBD5E1'}
+                    strokeWidth={isCollisionNode || isSelected ? 1.8 : 1.2}
                     className="pointer-events-none shadow-xs"
                   />
                   <text
-                    y={node.radius + 16.5}
+                    y={node.radius + 17.5}
                     textAnchor="middle"
-                    fill="#0F172A"
-                    fontSize="10"
-                    fontWeight="800"
+                    fill={isCollisionNode ? '#B91C1C' : '#0F172A'}
+                    fontSize="9"
+                    fontWeight="700"
                     className="select-none pointer-events-none font-sans"
                   >
-                    {node.label.length > 18 ? node.label.substring(0, 16) + '...' : node.label}
-                  </text>
-
-                  {/* Secondary Type Pill */}
-                  <rect
-                    x={-42}
-                    y={node.radius + 24}
-                    width={84}
-                    height={14}
-                    rx={4}
-                    fill="#F8FAFC"
-                    stroke="#E2E8F0"
-                    strokeWidth={1}
-                    className="pointer-events-none"
-                  />
-                  <text
-                    y={node.radius + 34}
-                    textAnchor="middle"
-                    fill={typeBadgeColor}
-                    fontSize="8.5"
-                    fontWeight="800"
-                    fontFamily="monospace"
-                    className="select-none pointer-events-none"
-                  >
-                    :{node.type}
+                    {displayText}
                   </text>
                 </g>
               );

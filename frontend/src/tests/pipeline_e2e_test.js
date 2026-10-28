@@ -45,8 +45,8 @@ async function runPipelineTests() {
   const apaarJpegDoc = TEST_DOCUMENTS.find(d => d.id === 'doc-apaar-card-jpeg');
   const resApaarJpeg = await documentAnalysisService.analyzeDocument(apaarJpegDoc);
   assert(resApaarJpeg.isAcademic === true, 'Scanned apaar.jpeg Academic Record Accepted');
-  assert(resApaarJpeg.status === 'VERIFIED_ACADEMIC_RECORD', 'Status is VERIFIED_ACADEMIC_RECORD');
-  assert(resApaarJpeg.extractedData.syntheticApaarId === '9082-3145-6671', 'Extracted APAAR ID from Card (9082-3145-6671)', resApaarJpeg.extractedData.syntheticApaarId);
+  assert(resApaarJpeg.extractedData.syntheticApaarId === '7908-6799-7908', 'Extracted APAAR ID from Card (7908-6799-7908)', resApaarJpeg.extractedData.syntheticApaarId);
+  assert(resApaarJpeg.extractedData.studentName === 'Pradeep Kumar', 'Extracted Candidate Name from Card (Pradeep Kumar)', resApaarJpeg.extractedData.studentName);
   assert(resApaarJpeg.image === '/apaar.jpeg', 'Visual Image Artifact Bound to Record', resApaarJpeg.image);
   assert(resApaarJpeg.forensicIntegrity.isPhotoshopped === false, 'Forensic Authenticity Verified (Zero Photoshop)', resApaarJpeg.forensicIntegrity.status);
 

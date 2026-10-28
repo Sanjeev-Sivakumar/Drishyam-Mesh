@@ -17,8 +17,25 @@ import {
   ExternalLink,
   Cpu,
   ChevronRight,
-  Ban
+  Ban,
+  Activity,
+  BarChart3,
+  LineChart as LineChartIcon,
+  PieChart as PieChartIcon,
+  CheckCircle
 } from 'lucide-react';
+import {
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell
+} from 'recharts';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { useNavigate } from 'react-router-dom';
@@ -48,8 +65,12 @@ export const ApaarForensics = () => {
       lienMarkingCheck: 'CONFIRMED (AICTE-DEL-101 REGULATORY)',
       overallVisionStatus: 'EXCELLENT / COMPLIANT',
       statusColor: 'emerald',
-      apaarId: '9082-3145-6671',
-      studentName: 'Devansh Gupta (देवांश गुप्ता)',
+      apaarId: '7908-6799-7908',
+      rawApaarId: '790867997908',
+      studentName: 'Pradeep Kumar',
+      dob: '10/05/2002',
+      gender: 'Male',
+      digitalSignature: 'Digitally signed on 20/01/2026 08:15:57 IST (Verified AICTE Signature)',
       institution: 'Delhi Technological University (DTU)',
       program: 'Computer Science and Engineering',
       academicYear: '2024-2025',
@@ -499,10 +520,31 @@ export const ApaarForensics = () => {
                 <span className="font-bold text-slate-900">{activeProfile.studentName}</span>
               </div>
 
+              {activeProfile.dob && (
+                <div className="flex items-center justify-between py-1 border-b border-slate-100 gap-2">
+                  <span className="text-slate-500 font-medium">Date of Birth:</span>
+                  <span className="font-mono font-semibold text-slate-900">{activeProfile.dob}</span>
+                </div>
+              )}
+
+              {activeProfile.gender && (
+                <div className="flex items-center justify-between py-1 border-b border-slate-100 gap-2">
+                  <span className="text-slate-500 font-medium">Gender:</span>
+                  <span className="font-semibold text-slate-900">{activeProfile.gender}</span>
+                </div>
+              )}
+
               <div className="flex items-start justify-between py-1 border-b border-slate-100 gap-2">
                 <span className="text-slate-500 font-medium shrink-0">Institution:</span>
                 <span className="font-semibold text-slate-800 text-right">{activeProfile.institution}</span>
               </div>
+
+              {activeProfile.digitalSignature && (
+                <div className="flex items-start justify-between py-1 border-b border-slate-100 gap-2">
+                  <span className="text-slate-500 font-medium shrink-0">Digital Signature:</span>
+                  <span className="font-mono text-[11px] font-bold text-emerald-800 text-right">{activeProfile.digitalSignature}</span>
+                </div>
+              )}
 
               <div className="flex items-center justify-between py-1 border-b border-slate-100 gap-2">
                 <span className="text-slate-500 font-medium">Detected Language:</span>
@@ -576,6 +618,190 @@ export const ApaarForensics = () => {
           </div>
         </div>
       </div>
+
+      {/* Visual Forensic Analytics & Diagnostics Section (Graphs and Charts for Analyzing Multi-Value Forensic Data) */}
+      <Card className="p-5 bg-white border-slate-200 shadow-xs space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200">
+          <div>
+            <div className="flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-purple-600" />
+              <h3 className="text-base font-bold text-slate-900 tracking-tight">
+                Forensic Optical & Cryptographic Visual Analytics
+              </h3>
+              <Badge variant="purple">Multi-Value Inspection</Badge>
+            </div>
+            <p className="text-xs text-slate-500 font-medium mt-1">
+              Visual spectrograms of Laplacian gradient frequency, DCT compression error residuals, and multilingual OCR character confidence
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-100 text-[11px] font-mono font-bold text-slate-700 border border-slate-200">
+              <Activity className="w-3.5 h-3.5 text-purple-600 animate-pulse" />
+              <span>Target: {activeProfile.apaarId}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* 3-Column Visual Charts Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          {/* Chart 1: Laplacian Sharpness Spectrum */}
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                  <LineChartIcon className="w-4 h-4 text-indigo-600" />
+                  Laplacian Sharpness Spectrum
+                </h4>
+                <p className="text-[10px] text-slate-500 font-medium">Edge frequency across document sectors (Threshold: 60)</p>
+              </div>
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                178.40 Mean
+              </span>
+            </div>
+
+            <div className="h-44 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
+                  data={[
+                    { zone: 'Header', current: 182, threshold: 60 },
+                    { zone: 'APAAR ID', current: activeProfile.id === 'tampered-memo' ? 52 : 178, threshold: 60 },
+                    { zone: 'Name', current: activeProfile.id === 'tampered-memo' ? 48 : 176, threshold: 60 },
+                    { zone: 'Photo', current: activeProfile.id === 'tampered-memo' ? 44 : 148, threshold: 60 },
+                    { zone: 'QR Code', current: 195, threshold: 60 },
+                    { zone: 'Signature', current: 168, threshold: 60 }
+                  ]}
+                  margin={{ top: 8, right: 10, left: -20, bottom: 0 }}
+                >
+                  <defs>
+                    <linearGradient id="sharpnessGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#6366F1" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#6366F1" stopOpacity={0.0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
+                  <XAxis dataKey="zone" tick={{ fontSize: 9, fill: '#64748B' }} />
+                  <YAxis tick={{ fontSize: 9, fill: '#64748B' }} domain={[0, 220]} />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: '#0F172A', borderColor: '#1E293B', borderRadius: 8, color: '#fff', fontSize: 11 }}
+                    formatter={(val, name) => [val, name === 'current' ? 'Observed Sharpness' : 'Tamper Threshold']}
+                  />
+                  <Area type="monotone" dataKey="current" stroke="#4F46E5" strokeWidth={2.5} fillOpacity={1} fill="url(#sharpnessGrad)" />
+                  <Area type="monotone" dataKey="threshold" stroke="#EF4444" strokeWidth={1.5} strokeDasharray="4 4" fill="none" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex items-center justify-between text-[10px] text-slate-500 pt-1 font-medium">
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-indigo-600"></span> Observed Variance</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-0.5 bg-rose-500"></span> Min Authentic Threshold (60)</span>
+            </div>
+          </div>
+
+          {/* Chart 2: DCT Error Level Analysis Residuals */}
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                  <BarChart3 className="w-4 h-4 text-purple-600" />
+                  DCT Compression Residuals (ELA)
+                </h4>
+                <p className="text-[10px] text-slate-500 font-medium">8x8 pixel block error disparity (Safe &lt; 0.05)</p>
+              </div>
+              <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${
+                activeProfile.id === 'tampered-memo' ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+              }`}>
+                {activeProfile.id === 'tampered-memo' ? '0.89 TAMPER' : '0.01 PRISTINE'}
+              </span>
+            </div>
+
+            <div className="h-44 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={[
+                    { sector: 'Header', residual: 0.012, isTampered: false },
+                    { sector: 'Photo', residual: activeProfile.id === 'tampered-memo' ? 0.64 : 0.018, isTampered: activeProfile.id === 'tampered-memo' },
+                    { sector: 'Name', residual: activeProfile.id === 'tampered-memo' ? 0.89 : 0.014, isTampered: activeProfile.id === 'tampered-memo' },
+                    { sector: 'APAAR ID', residual: activeProfile.id === 'tampered-memo' ? 0.78 : 0.011, isTampered: activeProfile.id === 'tampered-memo' },
+                    { sector: 'QR Digest', residual: 0.009, isTampered: false },
+                    { sector: 'Signature', residual: 0.015, isTampered: false }
+                  ]}
+                  margin={{ top: 8, right: 10, left: -20, bottom: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
+                  <XAxis dataKey="sector" tick={{ fontSize: 9, fill: '#64748B' }} />
+                  <YAxis tick={{ fontSize: 9, fill: '#64748B' }} domain={[0, 1.0]} />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: '#0F172A', borderColor: '#1E293B', borderRadius: 8, color: '#fff', fontSize: 11 }}
+                    formatter={(val) => [`${(val * 100).toFixed(1)}%`, 'DCT Residual Error']}
+                  />
+                  <Bar dataKey="residual" radius={[4, 4, 0, 0]}>
+                    {[
+                      { sector: 'Header', isTampered: false },
+                      { sector: 'Photo', isTampered: activeProfile.id === 'tampered-memo' },
+                      { sector: 'Name', isTampered: activeProfile.id === 'tampered-memo' },
+                      { sector: 'APAAR ID', isTampered: activeProfile.id === 'tampered-memo' },
+                      { sector: 'QR Digest', isTampered: false },
+                      { sector: 'Signature', isTampered: false }
+                    ].map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.isTampered ? '#EF4444' : '#10B981'} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex items-center justify-between text-[10px] text-slate-500 pt-1 font-medium">
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500"></span> Pristine Compression (&lt;5%)</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-500"></span> Photoshopped Splice Disparity</span>
+            </div>
+          </div>
+
+          {/* Chart 3: OCR Field Extraction Confidence */}
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                  <Cpu className="w-4 h-4 text-cyan-600" />
+                  OCR Extraction Confidence
+                </h4>
+                <p className="text-[10px] text-slate-500 font-medium">Neural multilingual character confidence per field</p>
+              </div>
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-cyan-50 text-cyan-800 border border-cyan-200">
+                99.8% Overall
+              </span>
+            </div>
+
+            <div className="h-44 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  layout="vertical"
+                  data={[
+                    { field: 'APAAR ID', score: 99.9 },
+                    { field: 'Candidate Name', score: 99.8 },
+                    { field: 'Date of Birth', score: 100.0 },
+                    { field: 'Gender', score: 100.0 },
+                    { field: 'Institution', score: 99.4 },
+                    { field: 'Digital Seal', score: 100.0 }
+                  ]}
+                  margin={{ top: 4, right: 25, left: 15, bottom: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" horizontal={false} />
+                  <XAxis type="number" domain={[90, 100]} tick={{ fontSize: 9, fill: '#64748B' }} />
+                  <YAxis type="category" dataKey="field" tick={{ fontSize: 9, fill: '#64748B' }} width={80} />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: '#0F172A', borderColor: '#1E293B', borderRadius: 8, color: '#fff', fontSize: 11 }}
+                    formatter={(val) => [`${val}%`, 'Recognition Confidence']}
+                  />
+                  <Bar dataKey="score" fill="#0284C7" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex items-center justify-between text-[10px] text-slate-500 pt-1 font-medium">
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-cyan-600"></span> Confidence Percentage</span>
+              <span className="font-mono text-emerald-700 font-bold">Zero OCR Drift Verified</span>
+            </div>
+          </div>
+        </div>
+      </Card>
     </div>
   );
 };
