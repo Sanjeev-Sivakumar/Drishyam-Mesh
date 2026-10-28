@@ -11,6 +11,7 @@ import com.sentinel.ledger.repository.ProgramIntakeRepository;
 import com.sentinel.ledger.repository.StudentRepository;
 import com.sentinel.ledger.service.CryptoService;
 import com.sentinel.ledger.service.DuplicateDetectionService;
+import com.sentinel.ledger.service.MailDispensaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +35,7 @@ public class WorkflowController {
     private final AuditLogRepository auditLogRepository;
     private final DuplicateDetectionService duplicateDetectionService;
     private final CryptoService cryptoService;
+    private final MailDispensaryService mailDispensaryService;
 
     public WorkflowController(
             StudentRepository studentRepository,
@@ -41,13 +43,15 @@ public class WorkflowController {
             ProgramIntakeRepository programIntakeRepository,
             AuditLogRepository auditLogRepository,
             DuplicateDetectionService duplicateDetectionService,
-            CryptoService cryptoService) {
+            CryptoService cryptoService,
+            MailDispensaryService mailDispensaryService) {
         this.studentRepository = studentRepository;
         this.institutionRepository = institutionRepository;
         this.programIntakeRepository = programIntakeRepository;
         this.auditLogRepository = auditLogRepository;
         this.duplicateDetectionService = duplicateDetectionService;
         this.cryptoService = cryptoService;
+        this.mailDispensaryService = mailDispensaryService;
     }
 
     @GetMapping("/status")
@@ -167,6 +171,10 @@ public class WorkflowController {
                 nodeExecutionTrace.add(createNodeTrace("c5", "Circuit Breaker Dispatcher", "13ms", "SUCCESS",
                         Map.of("circuitState", "ARMED", "thresholdRule", "ENROLMENT_GT_APPROVED"),
                         Map.of("actionTaken", collisionDetected ? "QUOTA_CIRCUIT_TRIPPED_AUDIT_LOGGED" : "GOVERNANCE_AUDIT_LOGGED", "registryLock", false)));
+                if (collisionDetected) {
+                    mailDispensaryService.sendIntakeQuotaAlert(instName, "Computer Science and Engineering", 192, 180);
+                    liveLogs.add(String.format("[%s] [MAIL DISPENSARY] Dispatched APH Quota Drift alert to sanjeevkumaredu8@gmail.com.", nowTime));
+                }
                 break;
 
             case "D":
@@ -187,6 +195,14 @@ public class WorkflowController {
                 nodeExecutionTrace.add(createNodeTrace("d5", "Offline Ed25519 QR Generator", "12ms", "SUCCESS",
                         Map.of("compression", "BASE45_DEFLATE", "keyId", "aicte-credential-signer-v1"),
                         Map.of("qrPayloadGenerated", true, "offlineVerifiable", true, "status", "ISSUED_COMPLIANT")));
+                mailDispensaryService.sendVerifiableCredentialPackage(
+                        matchingStudent != null ? matchingStudent.getStudentName() : "Devansh Gupta",
+                        targetApaar,
+                        "AICTE-CRED-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase(),
+                        "Bachelor of Technology in Computer Science and Engineering",
+                        blockHash
+                );
+                liveLogs.add(String.format("[%s] [MAIL DISPENSARY] Dispatched W3C Verifiable Credential package to sanjeevkumaredu8@gmail.com.", nowTime));
                 break;
 
             case "B":
@@ -207,6 +223,16 @@ public class WorkflowController {
                 nodeExecutionTrace.add(createNodeTrace("b5", "Admission Policy Gate", "16ms", "SUCCESS",
                         Map.of("program", "Computer Science", "approvedIntake", 180, "actualAdmitted", 178),
                         Map.of("intakeCompliance", "WITHIN_LIMIT", "residualSeats", 2, "circuitBreaker", "DISARMED")));
+                if (collisionDetected) {
+                    mailDispensaryService.sendCollisionDisputeAlert(
+                            matchingStudent != null ? matchingStudent.getStudentName() : "Devansh Gupta",
+                            targetApaar,
+                            "Delhi Technological University (DTU)",
+                            "COEP Technological University Pune",
+                            1L
+                    );
+                    liveLogs.add(String.format("[%s] [MAIL DISPENSARY] Dispatched incident alert to sanjeevkumaredu8@gmail.com for collision CASE #1.", nowTime));
+                }
                 break;
         }
 

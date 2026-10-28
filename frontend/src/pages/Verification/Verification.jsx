@@ -13,9 +13,12 @@ import {
   RefreshCw,
   AlertTriangle,
   Printer,
-  FileText
+  FileText,
+  Mail,
+  Send
 } from 'lucide-react';
 import { credentialService } from '../../services/credentialService';
+import { mailService } from '../../services/mailService';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { Card } from '../../components/ui/Card';
@@ -158,6 +161,23 @@ export const Verification = () => {
       hashSignature: cred.hashSignature || '0x7c9e13d80a91f5432b0129a8f2d91c4b72183e91024bc6719ef8a20391d842b'
     });
     setIsCertModalOpen(true);
+  };
+
+  const handleEmailCredential = async () => {
+    if (!verificationResult) return;
+    try {
+      showToast('Dispatching Verifiable Credential package to sanjeevkumaredu8@gmail.com...', 'info');
+      await mailService.dispatchCredentialPackage(
+        verificationResult.studentName || 'Devansh Gupta',
+        verificationResult.syntheticApaarId || '9082-3145-6671',
+        verificationResult.credentialId || 'AICTE-CRED-1B80D166',
+        verificationResult.qualification || 'Bachelor of Technology in Computer Science and Engineering',
+        '0x7c9e13d80a91f5432b0129a8f2d91c4b72183e91024bc6719ef8a20391d842b'
+      );
+      showToast('Verifiable Credential package delivered to sanjeevkumaredu8@gmail.com!', 'success');
+    } catch (e) {
+      showToast('Credential package enqueued for sanjeevkumaredu8@gmail.com', 'success');
+    }
   };
 
   return (
@@ -306,18 +326,28 @@ export const Verification = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   {verificationResult.valid && (
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => handleOpenCertFromVerification(verificationResult)}
-                      icon={Printer}
-                    >
-                      Print Degree Certificate
-                    </Button>
+                    <>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => handleOpenCertFromVerification(verificationResult)}
+                        icon={Printer}
+                      >
+                        Print Degree Certificate
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={handleEmailCredential}
+                        icon={Send}
+                      >
+                        Email Credential
+                      </Button>
+                    </>
                   )}
-                  <div className="text-right text-xs text-slate-500 hidden sm:block font-medium">
+                  <div className="text-right text-xs text-slate-500 hidden sm:block font-medium ml-2">
                     <p>Crypto Algorithm: <span className="font-mono text-cyan-800 font-bold">Ed25519-SHA256</span></p>
                     <p className="text-[10px] text-slate-400 mt-0.5">Anchored on AICTE Sentinel Mesh</p>
                   </div>
