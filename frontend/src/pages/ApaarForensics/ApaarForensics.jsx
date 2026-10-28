@@ -16,7 +16,8 @@ import {
   RefreshCw,
   ExternalLink,
   Cpu,
-  ChevronRight
+  ChevronRight,
+  Ban
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
@@ -144,27 +145,35 @@ export const ApaarForensics = () => {
 
     try {
       const result = await documentAnalysisService.analyzeDocument(file);
-      showToast('Document analyzed successfully!', 'success');
+      if (!result.isAcademic) {
+        showToast(result.status === 'FLAGGED_TAMPERED' ? 'Tampered document detected! Ingestion halted.' : 'Irrelevant non-academic document flagged! Ingestion halted.', 'error');
+      } else {
+        showToast('Academic document analyzed successfully!', 'success');
+      }
+
+      const isTampered = result.status === 'FLAGGED_TAMPERED';
+      const isIrrelevant = result.status === 'FLAGGED_IRRELEVANT' || !result.isAcademic;
       
       const newProfile = {
         id: 'uploaded-doc',
         title: file.name,
-        type: result.detectedCategory || 'Custom Document',
-        badge: result.multilingualProfile?.language || 'Analyzed Record',
+        type: result.detectedCategory || (isIrrelevant ? 'Irrelevant Non-Academic' : 'Custom Document'),
+        badge: isTampered ? 'Tampered / Photoshopped' : isIrrelevant ? 'Irrelevant Non-Academic' : (result.multilingualProfile?.language || 'Analyzed Record'),
         image: objectUrl,
-        issuingBankOrAuthority: result.extractedData?.institutionName || 'AICTE Verified Issuer',
-        docClassification: result.detectedCategory || 'Academic Allotment',
-        detectedLanguage: result.multilingualProfile?.language || 'English',
-        laplacianBlurVariance: '168.90 (Sharp)',
-        elaTamperDetection: result.forensicIntegrity?.isPhotoshopped ? '0.88 (Tampered)' : '0.01 (Pristine)',
-        lienMarkingCheck: result.forensicIntegrity?.isPhotoshopped ? 'REJECTED' : 'CONFIRMED (AICTE REGULATORY)',
-        overallVisionStatus: result.forensicIntegrity?.isPhotoshopped ? 'FLAGGED / TAMPERED' : 'EXCELLENT / COMPLIANT',
-        statusColor: result.forensicIntegrity?.isPhotoshopped ? 'rose' : 'emerald',
-        apaarId: result.extractedData?.syntheticApaarId || '9082-3145-6671',
-        studentName: result.extractedData?.studentName || file.name.replace(/\.[^/.]+$/, ''),
-        institution: result.extractedData?.institutionName || 'Recognized Technical College',
-        program: result.extractedData?.program || 'Engineering & Technology',
-        academicYear: '2024-2025',
+        issuingBankOrAuthority: isIrrelevant ? 'Zero Institutional Accreditation' : (result.extractedData?.institutionName || 'AICTE Verified Issuer'),
+        docClassification: result.detectedCategory || (isIrrelevant ? 'Irrelevant Non-Academic' : 'Academic Allotment'),
+        detectedLanguage: isIrrelevant ? 'N/A' : (result.multilingualProfile?.language || 'English'),
+        laplacianBlurVariance: isIrrelevant ? 'N/A (Irrelevant File)' : '168.90 (Sharp)',
+        elaTamperDetection: isTampered ? '0.88 (Tampered)' : isIrrelevant ? 'N/A (Non-Academic)' : '0.01 (Pristine)',
+        lienMarkingCheck: isIrrelevant ? 'REJECTED (NON-ACADEMIC)' : (isTampered ? 'REJECTED (TAMPERED)' : 'CONFIRMED (AICTE REGULATORY)'),
+        overallVisionStatus: isTampered ? 'FLAGGED / TAMPERED' : isIrrelevant ? 'FLAGGED / IRRELEVANT' : 'EXCELLENT / COMPLIANT',
+        statusColor: (isTampered || isIrrelevant) ? 'rose' : 'emerald',
+        apaarId: isIrrelevant ? 'N/A - QUARANTINED' : (result.extractedData?.syntheticApaarId || '9082-3145-6671'),
+        studentName: isIrrelevant ? 'N/A - Non-Academic File' : (result.extractedData?.studentName || file.name.replace(/\.[^/.]+$/, '')),
+        institution: isIrrelevant ? 'Zero Academic Provenance' : (result.extractedData?.institutionName || 'Recognized Technical College'),
+        program: isIrrelevant ? 'Quarantined File' : (result.extractedData?.program || 'Engineering & Technology'),
+        academicYear: isIrrelevant ? 'N/A' : '2024-2025',
+        isAcademic: result.isAcademic,
         note: result.reasons ? result.reasons.join(' • ') : 'Document parsed via Sentinel Cognitive Vision Engine with full forensic verification.'
       };
 
@@ -187,11 +196,19 @@ export const ApaarForensics = () => {
   };
 
   const handlePushToDiffChamber = () => {
+    if (activeProfile && activeProfile.isAcademic === false) {
+      showToast('Action Blocked: Irrelevant non-academic documents cannot be staged into Diff Chamber!', 'error');
+      return;
+    }
     showToast('Staged student identity record in Sandboxed Diff Chamber!', 'success');
     navigate('/imports');
   };
 
   const handleCheckGraphCollision = () => {
+    if (activeProfile && activeProfile.isAcademic === false) {
+      showToast('Action Blocked: Irrelevant non-academic documents have no APAAR identity graph!', 'error');
+      return;
+    }
     showToast('Executing Neo4j Cypher Traversal for APAAR token ' + activeProfile.apaarId, 'info');
     navigate('/knowledge-mesh');
   };
@@ -420,16 +437,18 @@ export const ApaarForensics = () => {
               <div className="flex items-center gap-2">
                 <Button
                   onClick={handlePushToDiffChamber}
-                  icon={GitPullRequest}
-                  variant="primary"
+                  icon={activeProfile?.isAcademic === false ? Ban : GitPullRequest}
+                  variant={activeProfile?.isAcademic === false ? "danger" : "primary"}
+                  disabled={activeProfile?.isAcademic === false}
                   className="text-xs"
                 >
-                  Ingest to Diff Chamber
+                  {activeProfile?.isAcademic === false ? "Ingress Blocked (Quarantined)" : "Ingest to Diff Chamber"}
                 </Button>
                 <Button
                   onClick={handleCheckGraphCollision}
                   icon={Share2}
                   variant="outline"
+                  disabled={activeProfile?.isAcademic === false}
                   className="text-xs"
                 >
                   Check Neo4j Collision

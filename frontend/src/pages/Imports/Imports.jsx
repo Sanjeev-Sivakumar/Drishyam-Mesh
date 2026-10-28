@@ -18,7 +18,8 @@ import {
   Share2,
   FileDiff,
   Cpu,
-  Sparkles
+  Sparkles,
+  Ban
 } from 'lucide-react';
 import { importService } from '../../services/importService';
 import { useAuth } from '../../context/AuthContext';
@@ -190,6 +191,35 @@ export const Imports = () => {
       {activeSubTab === 'DOCUMENT_AI' && (
         <div className="space-y-6">
           <DocumentAnalyzer onAnalysisComplete={handleDocumentAnalyzed} />
+
+          {/* If an irrelevant/non-academic or tampered document is loaded, show dedicated Quarantine Alert Box */}
+          {analyzedDocRecord && !analyzedDocRecord.isAcademic && (
+            <div className="p-6 rounded-2xl bg-rose-50 border-2 border-rose-400 space-y-3 animate-scale-up shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-11 h-11 rounded-2xl bg-rose-100 border border-rose-300 flex items-center justify-center text-rose-700 shrink-0">
+                    <Ban className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-sm font-bold text-rose-950">
+                        Document Quarantined - Registry Ingress Blocked
+                      </h4>
+                      <Badge variant="danger">INGESTION HALTED</Badge>
+                    </div>
+                    <p className="text-xs text-rose-800 mt-0.5">
+                      The file <strong>{analyzedDocRecord.fileName}</strong> was classified as <strong>{analyzedDocRecord.detectedCategory || 'Irrelevant Non-Academic'}</strong>.
+                      It contains zero verifiable AICTE/APAAR academic credentials. Storage into the authoritative student registry is strictly blocked.
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right text-xs text-rose-800 font-mono shrink-0">
+                  <p className="font-bold">STATUS: ISOLATED</p>
+                  <p className="text-[10px]">Zero Registry Rows Written</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* If an academic document is loaded, show dedicated Action Box and Sandboxed Diff Chamber */}
           {analyzedDocRecord && analyzedDocRecord.isAcademic && (

@@ -11,7 +11,8 @@ import {
   ArrowRight,
   ShieldAlert,
   Globe,
-  Camera
+  Camera,
+  Ban
 } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
@@ -24,6 +25,37 @@ export const SandboxedDiffChamber = ({ activeUploadedRecord = null, onCommitReco
   const [committedId, setCommittedId] = useState(null);
 
   useEffect(() => {
+    if (activeUploadedRecord && !activeUploadedRecord.isAcademic) {
+      setStagedChanges([
+        {
+          field: 'Document Provenance & Classification',
+          existingValue: 'AICTE Canonical Admission Registry',
+          stagedValue: `${activeUploadedRecord.detectedCategory || 'Irrelevant Non-Academic File'} [QUARANTINED]`,
+          status: 'REJECTED_NON_ACADEMIC',
+          diffType: 'QUARANTINED',
+          note: `Ingestion halted: "${activeUploadedRecord.fileName}" contains zero accredited academic provenance or APAAR identifiers.`
+        },
+        {
+          field: 'Registry Ingress Authorization',
+          existingValue: 'Strict Zero-Trust Boundary: Active',
+          stagedValue: 'Ingress Blocked - Isolated in Quarantine Chamber',
+          status: 'WRITE_PROHIBITED',
+          diffType: 'BLOCKED',
+          note: 'Registry Poisoning Prevention: File lacks valid institutional enrollment claims or course marks.'
+        },
+        {
+          field: 'National APAAR Identifier',
+          existingValue: 'Mandatory 12-Digit Format (XXXX-XXXX-XXXX)',
+          stagedValue: 'MISSING / INVALID',
+          status: 'NON_COMPLIANT',
+          diffType: 'REJECTED',
+          note: 'Zero student identity commitments found. Cannot map to national academic credit depository.'
+        }
+      ]);
+      setIsCommitted(false);
+      return;
+    }
+
     if (activeUploadedRecord && activeUploadedRecord.extractedData) {
       const data = activeUploadedRecord.extractedData;
       const isCollision = activeUploadedRecord.auditChecks?.psiDuplicateMatch;
@@ -124,6 +156,9 @@ export const SandboxedDiffChamber = ({ activeUploadedRecord = null, onCommitReco
   }, [activeUploadedRecord]);
 
   const handleCommit = async () => {
+    if (activeUploadedRecord && !activeUploadedRecord.isAcademic) {
+      return;
+    }
     setIsCommitted(true);
     const newStudentRef = activeUploadedRecord?.extractedData || {
       studentName: 'Devansh Gupta',
@@ -175,7 +210,12 @@ export const SandboxedDiffChamber = ({ activeUploadedRecord = null, onCommitReco
         </div>
 
         <div className="flex items-center gap-2">
-          {!isCommitted ? (
+          {activeUploadedRecord && !activeUploadedRecord.isAcademic ? (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300">
+              <Ban className="w-3.5 h-3.5 text-rose-700" />
+              <span>REGISTRY WRITE BLOCKED (QUARANTINED)</span>
+            </span>
+          ) : !isCommitted ? (
             <Button
               variant="primary"
               size="sm"

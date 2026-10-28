@@ -382,12 +382,17 @@ export const DocumentAnalyzer = ({ onAnalysisComplete }) => {
               </div>
 
               {/* Quarantine Action Pill */}
-              <div className="flex items-center justify-between p-3 rounded-xl bg-rose-100 border border-rose-300 text-xs">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-xl bg-rose-100 border border-rose-300 text-xs gap-2">
                 <div className="flex items-center gap-2 text-rose-900">
                   <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
                   <span><strong>Zero-Trust Ingestion Gate:</strong> {analysisResult.quarantineAction}</span>
                 </div>
-                <Badge variant="danger">QUARANTINED</Badge>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="font-mono text-[11px] font-bold text-rose-900 bg-white/70 px-2.5 py-1 rounded-md border border-rose-300">
+                    REGISTRY STORAGE: BLOCKED (0 ROWS WRITTEN)
+                  </span>
+                  <Badge variant="danger">QUARANTINED</Badge>
+                </div>
               </div>
             </div>
           )}

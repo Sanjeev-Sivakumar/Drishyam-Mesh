@@ -410,24 +410,50 @@ export const documentAnalysisService = {
     }
 
     // Step 2: Irrelevant Non-Academic Document Pattern Evaluation
-    const retailKeywords = ['walmart', 'grocery', 'subtotal', 'cash receipt', 'supermarket', 'tax invoice', 'milk', 'bread', 'visa ending', 'store manager', 'order summary', 'shipping address', 'refund policy', 'total paid', 'cart total'];
-    const utilityKeywords = ['electricity bill', 'bses', 'kwh', 'power distribution', 'meter reading', 'water board', 'gas bill', 'telecom bill', 'broadband receipt', 'cylinder booking', 'units consumed'];
-    const healthcareKeywords = ['pharmacy', 'prescription', 'apollo', 'paracetamol', 'amoxicillin', 'patient name', 'syrup', 'tablets', 'rx ', 'hospital bill', 'clinic'];
-    const financialKeywords = ['atm withdrawal', 'account statement', 'savings account', 'bank branch', 'cheque number', 'emi debit', 'hotel reservation', 'flight ticket', 'boarding pass', 'uber', 'ola cab'];
+    const retailKeywords = ['walmart', 'grocery', 'subtotal', 'cash receipt', 'supermarket', 'tax invoice', 'milk', 'bread', 'visa ending', 'store manager', 'order summary', 'shipping address', 'refund policy', 'total paid', 'cart total', 'pos terminal', 'gstin', 'vat rate', 'item description', 'cash memo', 'amazon', 'flipkart', 'order confirmation', 'retail store', 'supercenter'];
+    const utilityKeywords = ['electricity bill', 'bses', 'kwh', 'power distribution', 'meter reading', 'water board', 'gas bill', 'telecom bill', 'broadband receipt', 'cylinder booking', 'units consumed', 'utility bill', 'water bill', 'gas booking', 'discom', 'bescom', 'tneb', 'mseb'];
+    const healthcareKeywords = ['pharmacy', 'prescription', 'apollo', 'paracetamol', 'amoxicillin', 'patient name', 'syrup', 'tablets', 'rx ', 'hospital bill', 'clinic', 'doctor', 'dr. ', 'mbbs', 'md', 'dosage', 'capsules', 'diagnostics', 'pathology report', 'blood test', 'discharge summary', 'medical bill'];
+    const financialKeywords = ['atm withdrawal', 'account statement', 'savings account', 'current account', 'bank branch', 'cheque number', 'emi debit', 'hotel reservation', 'flight ticket', 'boarding pass', 'uber', 'ola cab', 'salary slip', 'payslip', 'pay slip', 'ctc', 'epfo', 'provident fund', 'form 16', 'income tax return', 'itr-v', 'credit card statement', 'bank account', 'passbook'];
+    const resumeKeywords = ['resume', 'curriculum vitae', 'curriculum_vitae', 'c.v.', 'work experience', 'professional summary', 'career objective', 'employment history', 'skills & competencies', 'technical skills', 'projects summary', 'job experience', 'linkedin.com', 'github.com/', 'references upon request'];
+    const legalKeywords = ['rental agreement', 'lease deed', 'rent agreement', 'tenant', 'landlord', 'affidavit', 'notary public', 'power of attorney', 'stamp paper', 'indemnity bond', 'terms of service', 'nda agreement'];
+    const travelKeywords = ['boarding pass', 'airline ticket', 'flight booking', 'pnr:', 'railway ticket', 'irctc', 'train ticket', 'bus ticket', 'metro fare', 'swiggy', 'zomato', 'movie ticket', 'hotel booking'];
+    const mediaKeywords = ['screenshot', 'screen_shot', 'whatsapp image', 'wallpaper', 'meme', 'selfie', 'camera roll', 'photo_', 'img_', 'dsc_'];
+    const codeKeywords = ['console.log', 'import react', 'public static void main', 'def main(', 'package.json', 'docker-compose', 'syntaxerror', 'traceback'];
 
     const hasRetail = retailKeywords.some(k => lower.includes(k));
     const hasUtility = utilityKeywords.some(k => lower.includes(k));
     const hasHealthcare = healthcareKeywords.some(k => lower.includes(k));
     const hasFinancial = financialKeywords.some(k => lower.includes(k));
+    const hasResume = resumeKeywords.some(k => lower.includes(k));
+    const hasLegal = legalKeywords.some(k => lower.includes(k));
+    const hasTravel = travelKeywords.some(k => lower.includes(k));
+    const hasMedia = mediaKeywords.some(k => lower.includes(k));
+    const hasCode = codeKeywords.some(k => lower.includes(k));
 
-    if (hasRetail || hasUtility || hasHealthcare || hasFinancial || lower.includes('bill') || lower.includes('receipt') || lower.includes('invoice') || lower.includes('irrelevant')) {
+    const isExplicitIrrelevant = hasRetail || hasUtility || hasHealthcare || hasFinancial ||
+      hasResume || hasLegal || hasTravel || hasMedia || hasCode ||
+      lower.includes('bill') || lower.includes('receipt') || lower.includes('invoice') || lower.includes('irrelevant');
+
+    if (isExplicitIrrelevant) {
       const detectedType = hasHealthcare
         ? 'Healthcare Medical Pharmacy Prescription'
         : hasRetail
         ? 'Commercial Retail Supermarket Invoice'
         : hasUtility
         ? 'Municipal Utility / Electricity Bill'
-        : 'Personal Commercial Financial Record';
+        : hasResume
+        ? 'Professional Resume / Curriculum Vitae'
+        : hasFinancial
+        ? 'Personal Banking / Financial Record'
+        : hasLegal
+        ? 'Legal Contract / Rental Agreement'
+        : hasTravel
+        ? 'Travel Boarding Pass / Transit Ticket'
+        : hasMedia
+        ? 'Digital Media / Personal Screenshot'
+        : hasCode
+        ? 'Source Code / Software Configuration Script'
+        : 'Commercial Retail Supermarket Invoice';
 
       return {
         isAcademic: false,
@@ -445,11 +471,12 @@ export const documentAnalysisService = {
         quarantineAction: 'Ingestion halted. Document isolated in Sentinel Quarantine Chamber to prevent registry poisoning.',
         confidenceScore: 99.8,
         fileName,
+        extractedData: null,
         forensicIntegrity: {
           isPhotoshopped: false,
           status: 'IRRELEVANT_NON_ACADEMIC',
-          authenticityScore: 100.0,
-          elaCheck: 'N/A - Non-academic Document',
+          authenticityScore: 0.0,
+          elaCheck: 'N/A - Non-academic Document Rejected',
           glyphBaselineCheck: 'N/A',
           cloneStampDetection: 'N/A',
           metadataProvenance: 'Verified Commercial Issuer'
@@ -457,10 +484,61 @@ export const documentAnalysisService = {
       };
     }
 
-    // Step 3: Multilingual Indian Language Detection & Parsing
+    // Step 3: Zero-Trust Positive Academic Provenance Verification
+    const apaarRegex = /\b[0-9]{4}-[0-9]{4}-[0-9]{4}\b/;
+    const hasApaarId = apaarRegex.test(content) || lower.includes('apaar') || lower.includes('अपार') || lower.includes('பதிவு') || lower.includes('नोंदणी');
+
+    const academicKeywords = [
+      'aicte', 'allotment memo', 'allotment order', 'allotment letter', 'allotment slip',
+      'admission order', 'admission memo', 'admission slip', 'cap round', 'counseling', 'counselling',
+      'ugc', 'dte', 'tnea', 'mah-cet', 'kea', 'wbjee', 'joosa', 'csab', 'jee main', 'gate', 'neet',
+      'bachelor of technology', 'b.tech', 'm.tech', 'b.e.', 'm.e.', 'polytechnic', 'diploma in engineering',
+      'engineering', 'technology', 'university', 'college', 'institute of technology',
+      'student registration', 'enrollment number', 'roll number', 'degree certificate',
+      'marksheet', 'grade sheet', 'semester', 'supernumerary', 'management_supernumerary',
+      'central academic', 'academic year', 'seat allocation', 'qualification',
+      // Multilingual regional terms
+      'अपार', 'प्रवेश', 'आवंटन', 'विद्यार्थी', 'महाविद्यालय', 'विश्वविद्यालय', 'अभियांत्रिकी', 'शिक्षा मंत्रालय',
+      'சேர்க்கை', 'கல்லூரி', 'பல்கலைக்கழகம்', 'பொறியியல்', 'ஒதுக்கீட்டு', 'மாணவர்',
+      'नोंदणी', 'वाटप', 'अभियांत्रिकी', 'महाविद्यालय', 'संचालनालय'
+    ];
+
+    const hasAcademicEvidence = hasApaarId || academicKeywords.some(k => lower.includes(k));
+
+    if (!hasAcademicEvidence) {
+      return {
+        isAcademic: false,
+        status: 'FLAGGED_IRRELEVANT',
+        flaggedTitle: 'Irrelevant Non-Academic Document Flagged',
+        detectedCategory: 'Unrecognized Non-Academic Record',
+        provenanceCheck: 'FAILED - Zero Institutional Academic Provenance',
+        reasons: [
+          `Uploaded document "${fileName}" does not contain accredited AICTE or university admission credentials`,
+          'Failed AICTE canonical schema validation: Missing APAAR 12-digit student identifier pattern (XXXX-XXXX-XXXX)',
+          'Zero academic provenance: No university, technical college, or state entrance council credentials found',
+          'Document contains zero verified academic credits, degree qualifications, or admission marks'
+        ],
+        threatLevel: 'HIGH_QUARANTINE',
+        quarantineAction: 'Ingestion halted. Document isolated in Sentinel Quarantine Chamber to prevent registry poisoning.',
+        confidenceScore: 99.8,
+        fileName,
+        extractedData: null,
+        forensicIntegrity: {
+          isPhotoshopped: false,
+          status: 'IRRELEVANT_NON_ACADEMIC',
+          authenticityScore: 0.0,
+          elaCheck: 'N/A - Non-academic Document Rejected',
+          glyphBaselineCheck: 'N/A',
+          cloneStampDetection: 'N/A',
+          metadataProvenance: 'Unverified Non-Academic Entity'
+        }
+      };
+    }
+
+    // Step 4: Multilingual Indian Language Detection & Parsing
     const langProfile = this.detectIndianLanguage(content);
 
-    // Step 4: Academic Pattern Matching (APAAR / State Allotment / University Credential)
+    // Step 5: Academic Pattern Matching (APAAR / State Allotment / University Credential)
     const isTamilDoc = langProfile.language.includes('Tamil');
     const isMarathiDoc = langProfile.language.includes('Marathi');
     const isHindiDoc = langProfile.language.includes('Hindi');

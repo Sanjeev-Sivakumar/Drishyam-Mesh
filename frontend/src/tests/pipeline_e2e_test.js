@@ -110,6 +110,34 @@ async function runPipelineTests() {
   assert(resPharmacy.status === 'FLAGGED_IRRELEVANT', 'Status FLAGGED_IRRELEVANT');
   assert(resPharmacy.detectedCategory.includes('Healthcare Medical Pharmacy Prescription'), 'Category Classified as Healthcare Prescription');
 
+  // Test 8B: Professional Resume / CV Rejection
+  console.log('\n--- TEST GROUP 8B: IRRELEVANT DOCUMENT (PROFESSIONAL RESUME / CV) ---');
+  const resumePayload = `CURRICULUM VITAE - JOHN DOE
+Software Engineer | linkedin.com/in/johndoe | github.com/johndoe
+WORK EXPERIENCE: Senior Full Stack Developer at Acme Corp (2021 - Present)
+- Architected microservices with Spring Boot and React
+SKILLS: Java, Python, Docker, Kubernetes
+DECLARATION: I hereby declare that the details furnished above are true to the best of my knowledge.`;
+  const resResume = await documentAnalysisService.analyzeDocument(resumePayload, { fileName: 'John_Doe_Resume.pdf' });
+  assert(resResume.isAcademic === false, 'Professional Resume Rejected from Registry');
+  assert(resResume.status === 'FLAGGED_IRRELEVANT', 'Classified as FLAGGED_IRRELEVANT');
+  assert(resResume.detectedCategory.includes('Resume'), 'Category Classified as Resume / CV', resResume.detectedCategory);
+  assert(resResume.extractedData === null, 'Zero Synthetic Student Data Created (extractedData is null)');
+
+  // Test 8C: Arbitrary Non-Academic Document (Zero Academic Provenance)
+  console.log('\n--- TEST GROUP 8C: ARBITRARY NON-ACADEMIC DOCUMENT (ZERO PROVENANCE) ---');
+  const arbitraryPayload = `DAILY PROGRESS REPORT - SITE INSPECTION #402
+Project: Metro Flyover Expansion Sector 14
+Site Supervisor: Rajesh Verma
+Weather Conditions: Clear, 28C
+Status: Concrete pouring for pillar 12 completed. Cement bags utilized: 450.
+Next Milestone: Steel bar reinforcement checks tomorrow morning.`;
+  const resArbitrary = await documentAnalysisService.analyzeDocument(arbitraryPayload, { fileName: 'site_progress_report.pdf' });
+  assert(resArbitrary.isAcademic === false, 'Arbitrary Non-Academic File Rejected');
+  assert(resArbitrary.status === 'FLAGGED_IRRELEVANT', 'Status is FLAGGED_IRRELEVANT');
+  assert(resArbitrary.detectedCategory.includes('Unrecognized Non-Academic Record'), 'Category is Unrecognized Non-Academic', resArbitrary.detectedCategory);
+  assert(resArbitrary.extractedData === null, 'Extracted Data is null to prevent database poisoning');
+
   // Test 9: Concurrent Dual Enrollment Collision (Neo4j & PSI)
   console.log('\n--- TEST GROUP 9: CONCURRENT ADMISSION COLLISION DETECTION ---');
   const collisionDoc = TEST_DOCUMENTS.find(d => d.id === 'doc-concurrent-duplicate');
