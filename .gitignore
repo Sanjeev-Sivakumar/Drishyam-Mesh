@@ -29,3 +29,9 @@ scratch/
 .env.*.local
 *.pem
 *.key
+
+# Voices and media recordings (local working files only)
+voices/
+*.wav
+*.mp3
+backend/data/*.db
