@@ -34,4 +34,7 @@ scratch/
 voices/
 *.wav
 *.mp3
+*.mp4
+*.webm
+~$*
 backend/data/*.db
