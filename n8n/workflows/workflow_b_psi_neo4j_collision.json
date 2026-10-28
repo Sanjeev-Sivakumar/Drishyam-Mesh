@@ -1,0 +1,112 @@
+{
+  "name": "Project Sentinel-Ledger • Workflow B: Privacy-Preserving Identity & Neo4j Collision Traversal",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "admissions/verify-identity",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "node-trigger-b",
+      "name": "Identity Verification Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [220, 280]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "bloom:apaar:{{ $json.syntheticApaarId }}"
+      },
+      "id": "node-bloom-filter",
+      "name": "Redis Bloom Candidate Filter",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [440, 280]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Diffie-Hellman Private Set Intersection (PSI) simulation\nconst apaar = $input.item.json.syntheticApaarId;\nconst hash = $input.item.json.aadhaarTokenHash;\nreturn {\n  ...$input.item.json,\n  psiMatched: apaar === '9082-3145-6671',\n  blindedToken: '0x' + Buffer.from(hash).reverse().toString('hex'),\n  psiProtocol: 'ECDH-PSI-P256'\n};"
+      },
+      "id": "node-psi-matcher",
+      "name": "Cryptographic PSI Matcher",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, 280]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "MATCH (s:Student {syntheticApaarId: $apaar})-[r:ENROLLED_AT]->(existing:Institution)\nWHERE existing.code <> $currentInstitutionCode\nRETURN s.name AS studentName, existing.name AS conflictingCollege, r.academicYear AS session, count(r) AS collisionCount;"
+      },
+      "id": "node-neo4j-traversal",
+      "name": "Neo4j Ghost Interceptor",
+      "type": "n8n-nodes-base.neo4j",
+      "typeVersion": 1,
+      "position": [880, 280]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ Boolean($json.collisionCount > 0) }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "node-collision-eval",
+      "name": "Collision Detected Conditional",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1100, 280]
+    },
+    {
+      "parameters": {
+        "url": "http://backend:8080/api/reviews/flag-collision",
+        "method": "POST",
+        "body": "={{ $json }}"
+      },
+      "id": "node-flag-review",
+      "name": "Dispatch Case to Review Center",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1320, 200]
+    },
+    {
+      "parameters": {
+        "url": "http://backend:8080/api/n8n/policy-pass",
+        "method": "POST",
+        "body": "={{ $json }}"
+      },
+      "id": "node-policy-gate",
+      "name": "Admission Policy Gate Approved",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1320, 360]
+    }
+  ],
+  "connections": {
+    "Identity Verification Webhook": {
+      "main": [[{ "node": "Redis Bloom Candidate Filter", "type": "main", "index": 0 }]]
+    },
+    "Redis Bloom Candidate Filter": {
+      "main": [[{ "node": "Cryptographic PSI Matcher", "type": "main", "index": 0 }]]
+    },
+    "Cryptographic PSI Matcher": {
+      "main": [[{ "node": "Neo4j Ghost Interceptor", "type": "main", "index": 0 }]]
+    },
+    "Neo4j Ghost Interceptor": {
+      "main": [[{ "node": "Collision Detected Conditional", "type": "main", "index": 0 }]]
+    },
+    "Collision Detected Conditional": {
+      "main": [
+        [{ "node": "Dispatch Case to Review Center", "type": "main", "index": 0 }],
+        [{ "node": "Admission Policy Gate Approved", "type": "main", "index": 0 }]
+      ]
+    }
+  }
+}

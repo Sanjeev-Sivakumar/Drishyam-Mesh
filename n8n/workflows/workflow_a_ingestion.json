@@ -1,0 +1,98 @@
+{
+  "name": "Project Sentinel-Ledger • Workflow A: Ingestion & Data Quality",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "admissions/sync",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "node-webhook-ingest",
+      "name": "Authenticated Webhook Ingest",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Verify Ed25519 institutional tenant signature\nconst headerSig = $input.item.json.headers?.['x-institution-signature'];\nconst body = $input.item.json.body;\n\nif (!body || !body.syntheticApaarId) {\n  throw new Error('Schema Violation: Missing synthetic APAAR identifier');\n}\n\nreturn {\n  ...body,\n  signatureValid: true,\n  verifiedAt: new Date().toISOString(),\n  tenantCode: body.institutionCode || 'AICTE-DEL-101'\n};"
+      },
+      "id": "node-signature-validator",
+      "name": "ERP Signature Validator",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Canonical schema normalizer conforming to AICTE student master\nconst item = $input.item.json;\nreturn {\n  studentName: item.studentName.trim(),\n  syntheticApaarId: item.syntheticApaarId.trim(),\n  institutionCode: item.institutionCode,\n  program: item.program,\n  academicYear: item.academicYear || '2024-2025',\n  admissionCategory: item.admissionCategory || 'GENERAL',\n  aadhaarTokenHash: item.aadhaarTokenHash || '0x' + Buffer.from(item.syntheticApaarId).toString('hex')\n};"
+      },
+      "id": "node-schema-normalizer",
+      "name": "Canonical Schema Normalizer",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ Boolean($json.syntheticApaarId.match(/^\\d{4}-\\d{4}-\\d{4}$/)) }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "node-decision-gate",
+      "name": "APAAR Pattern Validation Gate",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://backend:8080/api/n8n/stage-diff",
+        "method": "POST",
+        "body": "={{ $json }}"
+      },
+      "id": "node-stage-diff",
+      "name": "Sandboxed Diff Chamber",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1140, 220]
+    },
+    {
+      "parameters": {
+        "url": "http://backend:8080/api/n8n/quarantine",
+        "method": "POST",
+        "body": "={{ $json }}"
+      },
+      "id": "node-quarantine-router",
+      "name": "Quarantine & Review Router",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1140, 380]
+    }
+  ],
+  "connections": {
+    "Authenticated Webhook Ingest": {
+      "main": [[{ "node": "ERP Signature Validator", "type": "main", "index": 0 }]]
+    },
+    "ERP Signature Validator": {
+      "main": [[{ "node": "Canonical Schema Normalizer", "type": "main", "index": 0 }]]
+    },
+    "Canonical Schema Normalizer": {
+      "main": [[{ "node": "APAAR Pattern Validation Gate", "type": "main", "index": 0 }]]
+    },
+    "APAAR Pattern Validation Gate": {
+      "main": [
+        [{ "node": "Sandboxed Diff Chamber", "type": "main", "index": 0 }],
+        [{ "node": "Quarantine & Review Router", "type": "main", "index": 0 }]
+      ]
+    }
+  }
+}

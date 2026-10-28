@@ -1,0 +1,194 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-sans: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --bg-page: #F8FAFC;
+    --bg-card: #FFFFFF;
+    --text-primary: #0F172A;
+    --text-secondary: #334155;
+    --text-muted: #64748B;
+    --border-color: #E2E8F0;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: #F8FAFC !important;
+    color: #0F172A !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #0F172A !important;
+  }
+
+  #root {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #F8FAFC !important;
+    color: #0F172A !important;
+  }
+}
+
+/* Crisp light theme scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Bento Box Architecture - White / Light Theme */
+.bento-card {
+  background-color: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.05), 0 1px 2px -1px rgba(15, 23, 42, 0.05) !important;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  color: #0F172A !important;
+}
+
+.bento-card:hover {
+  border-color: #CBD5E1 !important;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.07), 0 8px 10px -6px rgba(15, 23, 42, 0.04) !important;
+}
+
+.bento-card-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #E2E8F0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #F8FAFC !important;
+  color: #0F172A !important;
+}
+
+.bento-card-body {
+  padding: 1.25rem;
+}
+
+/* Glassmorphism & Light Surface Utilities */
+.glass-card {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(12px);
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.05) !important;
+}
+
+.glow-purple {
+  box-shadow: 0 0 20px -3px rgba(139, 92, 246, 0.25);
+}
+
+.glow-cyan {
+  box-shadow: 0 0 20px -3px rgba(6, 182, 212, 0.25);
+}
+
+.glow-emerald {
+  box-shadow: 0 0 20px -3px rgba(16, 185, 129, 0.25);
+}
+
+.glow-rose {
+  box-shadow: 0 0 20px -3px rgba(239, 68, 68, 0.25);
+}
+
+@keyframes pulseSlow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.02); }
+}
+
+.animate-pulse-slow {
+  animation: pulseSlow 3s ease-in-out infinite;
+}
+
+/* Containment & Anti-Collision */
+.contain-box {
+  contain: layout style;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.anti-collide {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* ========================================================================= */
+/* UNIVERSAL WHITE / LIGHT THEME OVERRIDES                                  */
+/* Eliminates dark black backgrounds, ensures crisp white surfaces and text */
+/* ========================================================================= */
+
+/* Surface Backgrounds (Cards, Panels, Inputs, Table Cells) */
+[class*="bg-[#0"],
+[class*="bg-[#1"],
+[class*="bg-[#2"],
+[class*="bg-slate-950"],
+.bg-slate-900:not([class*="fixed"]):not([class*="backdrop"]):not(button) {
+  background-color: #FFFFFF !important;
+}
+
+/* Page, Table Header & Subtle Section Backgrounds */
+[class*="bg-[#0A0B0E]"],
+[class*="bg-[#0a0b0e]"],
+[class*="bg-[#07080B]"],
+[class*="bg-[#07080b]"],
+[class*="bg-[#08090D]"],
+[class*="bg-[#08090d]"],
+[class*="bg-[#0E1017]"],
+[class*="bg-[#0e1017]"],
+thead[class*="bg-"],
+th[class*="bg-"] {
+  background-color: #F8FAFC !important;
+}
+
+/* Universal Light Theme Borders */
+[class*="border-[#"],
+[class*="border-slate-800"],
+[class*="border-slate-700"] {
+  border-color: #E2E8F0 !important;
+}
+
+/* High-Contrast Readable Text Typography Overrides */
+[class*="text-slate-100"] {
+  color: #0F172A !important;
+}
+
+[class*="text-slate-200"] {
+  color: #1E293B !important;
+}
+
+[class*="text-slate-300"] {
+  color: #334155 !important;
+}
+
+[class*="text-slate-400"] {
+  color: #475569 !important;
+}
+
+/* Dark Modal Backdrop */
+.bg-slate-900\/40,
+[class*="bg-[#07080B]"][class*="\/80"] {
+  background-color: rgba(15, 23, 42, 0.45) !important;
+}
+

@@ -1,0 +1,31 @@
+# Node & Build Artifacts
+node_modules/
+frontend/node_modules/
+frontend/dist/
+.npm
+.eslintcache
+
+# Java / Maven
+target/
+backend/target/
+*.class
+*.jar
+*.war
+.m2/
+
+# IDE & OS
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
+.system_generated/
+scratch/
+
+# Sensitive environment files
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
